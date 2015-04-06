@@ -25,10 +25,8 @@ Configuration
 | Property Name | Default | Description |
 | ------------- | :-----: | :---------- |
 | Channels | - |  |
-| Type | - | org.apache.flume.source.taildirectory.DirectoryTailSource |
-| dirs | - | NICK of directories, it's such as list of what directories are monitored |
-| dirs.NICK.path | - | Directory path |
-| unlockFileTime | 1 | Delay to check not modified files to unlock the access to them ( in minutes )
+| Type | - | org.keedio.watchdir.listener.WatchDirXMLWinEventSourceListener |
+| dirs | - | list of directoriesto be monitorized comma separated |
 
 * Example
 ```
