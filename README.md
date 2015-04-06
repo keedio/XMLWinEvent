@@ -1,12 +1,13 @@
 flume-taildirectory-source
 ===========================
-Source of Flume NG for tailing files in a directory
+Source of Flume NG for tailing files in a directory which has windows event xml format.
 
 Notes
 =====
-This plugin is based on jinoos (jinoos@gmail.com) https://github.com/jinoos/flume-ng-extends  
-Is refactored to support logs rotate in windows and linux, and the code has been cleaned to much more simple working, and apache.common.vfs2 dependency has been replaced with the native java 7 java.nio library.  
-Thanks for the inspiration.
+This plugin is based on flume-tail-directory https://github.com/keedio/flume-taildirectory-source  
+
+The module has been refactored in order to decoupled classes and has been created differents listeners.
+
 
 Compilation
 ===========
@@ -16,7 +17,7 @@ mvn package
 
 Use
 ===
-Make the directory in flume installation path ```$FLUME_HOME/plugins.d/tail-directory-source/lib``` and copy the file   ```flume-taildirectory-source-0.0.1.jar``` in it.  
+Make the directory in flume installation path ```$FLUME_HOME/plugins.d/tail-directory-source/lib``` and copy the file   ```flume-taildirectory-source-1.1.0.jar``` in it.  
 Edit flume configuration file with the parameters above.
 
 Configuration
@@ -31,13 +32,8 @@ Configuration
 
 * Example
 ```
-agent.sources = tailDir
-agent.sources.tailDir.type = org.apache.flume.source.taildirectory.DirectoryTailSource
-agent.sources.tailDir.dirs = tmpDir varLogDir
-agent.sources.tailDir.dirs.tmpDir.path = /tmp
-agent.sources.taildir.dirs.tmpDir.unlockFileTime = 1
-agent.sources.taildir.dirs.varLogDir.path = /var/log
-agent.sources.taildir.dirs.varLogDir.unlockFileTime = 1
+flume.sources.r1.type = org.keedio.watchdir.listener.WatchDirXMLWinEventSourceListener
+flume.sources.r1.dirs = /tmp/rolmo
 ```
 
 TO DO:
