@@ -1,5 +1,5 @@
-flume-taildirectory-source
-===========================
+XML Windows Event Source for Flume
+==================================
 Source of Flume NG for tailing files in a directory which has windows event xml format.
 
 Notes
