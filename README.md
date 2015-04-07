@@ -17,7 +17,7 @@ mvn package
 
 Use
 ===
-Make the directory in flume installation path ```$FLUME_HOME/plugins.d/tail-directory-source/lib``` and copy the file   ```flume-taildirectory-source-1.1.0.jar``` in it.  
+Make the directory in flume installation path ```$FLUME_HOME/plugins.d/xmlwinevent-source/lib``` and copy the file   ```xmlwineventsource-1.0.0.jar``` in it.  
 Edit flume configuration file with the parameters above.
 
 Configuration
@@ -26,7 +26,7 @@ Configuration
 | ------------- | :-----: | :---------- |
 | Channels | - |  |
 | Type | - | org.keedio.watchdir.listener.WatchDirXMLWinEventSourceListener |
-| dirs | - | list of directoriesto be monitorized comma separated |
+| dirs | - | list of directories to be monitorized comma separated |
 
 * Example
 ```
@@ -38,4 +38,3 @@ TO DO:
 ======
 
 * Include multi thread posibility to parallelize tasks
-* Test synchronization between threads
