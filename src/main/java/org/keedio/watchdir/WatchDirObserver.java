@@ -7,9 +7,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.keedio.watchdir.listener.FakeListener;
-import org.keedio.watchdir.listener.MultilineFileListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,14 +153,5 @@ public class WatchDirObserver implements Runnable {
     		}
     	}
 	}
-    
-    public static void main (String ...args) {
-    	
-    	String[] dirs = {"/Users/rolmo/temp"};
-    	WatchDirObserver monitor = new WatchDirObserver(dirs);
-    	monitor.addWatchDirListener(new FakeListener());
-    	monitor.addWatchDirListener(new MultilineFileListener());
-    	new Thread(monitor).start();
-    }
 
 }

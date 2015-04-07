@@ -46,7 +46,7 @@ public class WatchDirTest {
 			// Creamos el fichero
 			testFolder.newFile("tempFolder/dd.dat");
 			
-			Thread.sleep(20000);
+			waitFor(20);
 			verify(listener, atLeastOnce()).process(any(WatchDirEvent.class));
 			
 		} catch (Exception e) {
@@ -70,7 +70,7 @@ public class WatchDirTest {
 			Thread t = new Thread(monitor);
 			t.start();
 						
-			Thread.sleep(2000);
+			waitFor(2);
 			
 			Assert.assertTrue(!t.isAlive());;
 			
@@ -100,13 +100,13 @@ public class WatchDirTest {
 			// Creamos el fichero en el directorio 1 
 			testFolder.newFile("tempFolder2/dd.dat");
 			
-			Thread.sleep(20000);
+			waitFor(20);
 			verify(listener, times(1)).process(any(WatchDirEvent.class));
 			
 			// Creamos el fichero en el directorio 2 
 			testFolder.newFile("tempFolder1/dd.dat");
 			
-			Thread.sleep(20000);
+			waitFor(20);
 			verify(listener, times(1)).process(any(WatchDirEvent.class));
 
 		} catch (Exception e) {
@@ -115,6 +115,13 @@ public class WatchDirTest {
 		} catch (Throwable e) {
 			e.printStackTrace();
 			Assert.fail();
+		}
+	}
+	
+	private static void waitFor(int seg) throws InterruptedException {
+		for (int i=1;i<=seg;i++) {
+			System.out.println("... wating " + (seg - i) + " seconds");
+			Thread.sleep(1000);
 		}
 	}
 	

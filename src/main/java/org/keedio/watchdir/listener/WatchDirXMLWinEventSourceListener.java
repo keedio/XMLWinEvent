@@ -116,6 +116,8 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			Date inicio = new Date();
 			int procesados = 0;
 			XMLInputFactory xif = XMLInputFactory.newInstance();
+			xif.setProperty("javax.xml.stream.isNamespaceAware", false);
+
 			StreamSource source = new StreamSource(event.getPath());
 			XMLEventReader xev = xif.createXMLEventReader(source);
 			
@@ -126,12 +128,14 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			        String name = elem.getName().getLocalPart();
 
 			        if ("Event".equals(name)) {
-			        	//StringBuffer buf = new StringBuffer();
+			        	StringBuffer buf = new StringBuffer();
 			            String xmlFragment = readElementBody(xev);
 			            // lanzamos el evento a la canal flume
+			            buf.append("<Event>").append(xmlFragment).append("</Event>");
+			            
 			            procesados++;
 			            
-			    		Event ev = EventBuilder.withBody(String.valueOf(xmlFragment).getBytes());
+			    		Event ev = EventBuilder.withBody(String.valueOf(buf).getBytes());
 			    		getChannelProcessor().processEvent(ev);
 			            
 			            

@@ -3,12 +3,14 @@ package org.keedio.watchdir.listener;
 import java.io.StringWriter;
 import java.util.Date;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
+
 import org.apache.flume.source.AbstractSource;
 import org.keedio.watchdir.WatchDirEvent;
 import org.keedio.watchdir.WatchDirException;
@@ -81,9 +83,10 @@ public class XMLWinEventListener implements WatchDirListener{
 			Date inicio = new Date();
 			int procesados = 0;
 			XMLInputFactory xif = XMLInputFactory.newInstance();
+			xif.setProperty("javax.xml.stream.isNamespaceAware", false);
+
 			StreamSource source = new StreamSource(event.getPath());
 			XMLEventReader xev = xif.createXMLEventReader(source);
-			
 			while (xev.hasNext()) {
 			    XMLEvent xmlEvent = xev.nextEvent();
 			    if (xmlEvent.isStartElement()) {
@@ -91,9 +94,11 @@ public class XMLWinEventListener implements WatchDirListener{
 			        String name = elem.getName().getLocalPart();
 
 			        if ("Event".equals(name)) {
-			        	//StringBuffer buf = new StringBuffer();
+			        	StringBuffer buf = new StringBuffer();
 			            String xmlFragment = readElementBody(xev);
 			            // lanzamos el evento a la canal flume
+			            buf.append("<Event>").append(xmlFragment).append("</Event>");
+			            
 			            procesados ++;
 			            
 			        }
