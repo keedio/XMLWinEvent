@@ -2,9 +2,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.flume.sources-taildirectory</groupId>
-  <artifactId>flume-taildirectory-source</artifactId>
-  <version>1.1.0</version>
+  <groupId>org.keedio.flume</groupId>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
   <name>flume-taildirectory-source</name>
@@ -59,4 +58,5 @@
       </plugin>      
     </plugins>
   </build>
+  <artifactId>xmlwineventsource</artifactId>
 </project>
