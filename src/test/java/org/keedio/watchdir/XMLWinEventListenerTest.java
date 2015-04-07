@@ -48,7 +48,7 @@ public class XMLWinEventListenerTest {
 
 	@Test
 	public void test1() {
-
+		// Test parseo de fichero creado correctamente
 		WatchDirEvent eventFake = mock(WatchDirEvent.class);
 		doReturn("src/test/resources/test.xml").when(eventFake).getPath();
 		doReturn("ENTRY_CREATE").when(eventFake).getType();
@@ -70,11 +70,43 @@ public class XMLWinEventListenerTest {
 			Assert.assertTrue(outContent.toString().contains("35661"));
 			
 		} catch (WatchDirException e) { 
+			Assert.fail();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		} 
+	}
+
+	@Test
+	public void test2() {
+		// Test parseo de fichero creado correctamente
+		WatchDirEvent eventFake = mock(WatchDirEvent.class);
+		doReturn("src/test/resources/test2.xml").when(eventFake).getPath();
+		doReturn("ENTRY_CREATE").when(eventFake).getType();
+		
+		ChannelProcessor processor = mock(ChannelProcessor.class);
+		doNothing().when(processor).processEvent(any(Event.class));
+		
+		AbstractSource source = mock(AbstractSource.class);
+		when(source.getChannelProcessor()).thenReturn(processor);
+		
+		
+		
+		try {
+			// Si no existen listeners sale del hilo
+			XMLWinEventListener sample = new XMLWinEventListener();
+			sample.process(eventFake);
+			
+			// Si llegamos aqui el test esta mal
+			Assert.fail();
+			
+		} catch (WatchDirException e) { 
+			// El fichero esta mal formado
 			Assert.assertTrue(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();
 		} 
 	}
-	
+
 }
