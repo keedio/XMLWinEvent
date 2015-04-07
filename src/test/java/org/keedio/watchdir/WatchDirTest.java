@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.nio.file.WatchEvent;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,4 +56,66 @@ public class WatchDirTest {
 		}
 	}
 
+	@Test
+	public void test2() {
+
+		FakeListener listener = mock(FakeListener.class);
+		//doReturn(22).when(listener).process(any(WatchEvent.class));
+		
+		try {
+			// Si no existen listeners sale del hilo
+			File tstFolder = testFolder.newFolder("/tempFolder/");
+			String[] dirs = {tstFolder.getAbsolutePath()};
+			WatchDirObserver monitor = new WatchDirObserver(dirs);
+			Thread t = new Thread(monitor);
+			t.start();
+						
+			Thread.sleep(2000);
+			
+			Assert.assertTrue(!t.isAlive());;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void test3() {
+
+		FakeListener listener = mock(FakeListener.class);
+		//doReturn(22).when(listener).process(any(WatchEvent.class));
+		
+		try {
+			// Si no existen listeners sale del hilo
+			File tstFolder1 = testFolder.newFolder("/tempFolder1/");
+			File tstFolder2 = testFolder.newFolder("/tempFolder2/");
+			String[] dirs = {tstFolder1.getAbsolutePath(), tstFolder2.getAbsolutePath()};
+			WatchDirObserver monitor = new WatchDirObserver(dirs);
+			monitor.addWatchDirListener(listener);
+			Thread t = new Thread(monitor);
+			t.start();
+			
+			// Creamos el fichero en el directorio 1 
+			testFolder.newFile("tempFolder2/dd.dat");
+			
+			Thread.sleep(20000);
+			verify(listener, times(1)).process(any(WatchDirEvent.class));
+			
+			// Creamos el fichero en el directorio 2 
+			testFolder.newFile("tempFolder1/dd.dat");
+			
+			Thread.sleep(20000);
+			verify(listener, times(1)).process(any(WatchDirEvent.class));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+	}
+	
 }

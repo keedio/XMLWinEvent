@@ -74,8 +74,7 @@ public class XMLWinEventListener implements WatchDirListener{
 			
 	}
 
-	private String[] entryCreate(WatchDirEvent event) throws WatchDirException {
-		String all[] = {};
+	private void entryCreate(WatchDirEvent event) throws WatchDirException {
 
 		try {
 			
@@ -95,7 +94,7 @@ public class XMLWinEventListener implements WatchDirListener{
 			        	//StringBuffer buf = new StringBuffer();
 			            String xmlFragment = readElementBody(xev);
 			            // lanzamos el evento a la canal flume
-			            all[procesados++] = xmlFragment;
+			            procesados ++;
 			            
 			        }
 			    }			
@@ -111,7 +110,6 @@ public class XMLWinEventListener implements WatchDirListener{
 			throw new WatchDirException("Could not process file " + event.getPath());
 		}
 		
-		return all;
 	}
 
 }
