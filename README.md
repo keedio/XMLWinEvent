@@ -30,8 +30,10 @@ Configuration
 
 * Example
 ```
+...
 flume.sources.r1.type = org.keedio.watchdir.listener.WatchDirXMLWinEventSourceListener
 flume.sources.r1.dirs = /tmp/rolmo
+...
 ```
 
 TO DO:
