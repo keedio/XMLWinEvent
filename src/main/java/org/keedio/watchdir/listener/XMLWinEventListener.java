@@ -2,15 +2,12 @@ package org.keedio.watchdir.listener;
 
 import java.io.StringWriter;
 import java.util.Date;
-
-import javax.xml.XMLConstants;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
-
 import org.apache.flume.source.AbstractSource;
 import org.keedio.watchdir.WatchDirEvent;
 import org.keedio.watchdir.WatchDirException;
@@ -18,12 +15,13 @@ import org.keedio.watchdir.WatchDirListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class XMLWinEventListener implements WatchDirListener{
 	
 	private AbstractSource flumeSource = null;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(XMLWinEventListener.class);
-
+	
 	public AbstractSource getFlumeSource() {
 		return flumeSource;
 	}
@@ -116,5 +114,4 @@ public class XMLWinEventListener implements WatchDirListener{
 		}
 		
 	}
-
 }

@@ -62,9 +62,12 @@ public class XMLWinEventListenerTest {
 		
 		
 		try {
+			System.out.println("Comenzamos el test...");
 			// Si no existen listeners sale del hilo
 			XMLWinEventListener sample = new XMLWinEventListener();
 			sample.process(eventFake);
+			
+			Thread.sleep(10000);
 			
 			// Comprobamos 35661 eventos
 			Assert.assertTrue(outContent.toString().contains("35661"));

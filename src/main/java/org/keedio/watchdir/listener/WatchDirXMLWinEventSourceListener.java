@@ -24,12 +24,14 @@ import java.nio.file.FileSystems;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
+
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.EventDrivenSource;
@@ -40,9 +42,12 @@ import org.keedio.watchdir.WatchDirEvent;
 import org.keedio.watchdir.WatchDirException;
 import org.keedio.watchdir.WatchDirListener;
 import org.keedio.watchdir.WatchDirObserver;
+import org.keedio.watchdir.metrics.MetricsController;
+import org.keedio.watchdir.metrics.MetricsEvent;
 import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 
 public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
@@ -56,6 +61,8 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	private String confDirs;
 	private String[] dirs;
 	private WatchDirObserver monitor; 
+	private MetricsController metricsController;
+	
 	
 	@Override
 	public void configure(Context context) {
@@ -67,7 +74,8 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 
 
 		dirs = context.getString(CONFIG_DIRS).split(",");
-
+		metricsController = new MetricsController();
+		
 		Preconditions.checkState(dirs.length > 0, CONFIG_DIRS
 				+ " must be specified at least one.");		
 
@@ -80,6 +88,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		try {
 			monitor = new WatchDirObserver(dirs);
 			monitor.addWatchDirListener(this);
+			metricsController.start();
 			
 			Log.debug("Lanzamos el proceso");
 			new Thread(monitor).start();
@@ -94,6 +103,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	@Override
 	public void stop() {
 		LOGGER.info("Stopping source");
+		metricsController.stop();
 		super.stop();
 	}
 	
@@ -104,6 +114,9 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		switch(event.getType()) {
 		
 			case "ENTRY_CREATE":
+				// Notificamos nuevo fichero creado
+				metricsController.manage(new MetricsEvent(MetricsEvent.NEW_FILE));
+
 				entryCreate(event);	
 				break;
 		}
@@ -138,6 +151,8 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			    		Event ev = EventBuilder.withBody(String.valueOf(buf).getBytes());
 			    		getChannelProcessor().processEvent(ev);
 			            
+			    		// Notificamos un evento de nuevo mensaje
+			    		metricsController.manage(new MetricsEvent(MetricsEvent.NEW_EVENT));
 			            
 			        }
 			    }			
@@ -146,7 +161,10 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			long intervalo = (new Date().getTime() - inicio.getTime());
 			// Se usa el system out para procesar los test de forma correcta
 			System.out.println("Se han procesado " + procesados + " elementos en " + intervalo + " milisegundos");
-			
+
+			// Notificamos el tiempo de procesado para las metricas
+			metricsController.manage(new MetricsEvent(MetricsEvent.MEAN_FILE_PROCESS, intervalo));
+			metricsController.manage(new MetricsEvent(MetricsEvent.TOTAL_FILE_EVENTS, procesados));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
