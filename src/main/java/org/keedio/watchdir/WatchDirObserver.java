@@ -54,12 +54,12 @@ public class WatchDirObserver implements Runnable {
     	
     	//for (int i=0;i<dirs.length;i++){
     		try {
-    			Path _directotyToWatch = Paths.get(dir/*[i]*/);
+    			Path _directotyToWatch = Paths.get(dir);
     	        watcherSvc = FileSystems.getDefault().newWatchService();
     	        registerAll(_directotyToWatch);
 
     		} catch (IOException e){
-    			LOGGER.error("No se puede monitorizar el directorio: " + dir/*s[i]*/);
+    			LOGGER.error("No se puede monitorizar el directorio: " + dir);
     		}
     	//}
     	
