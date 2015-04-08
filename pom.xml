@@ -14,6 +14,11 @@
 
   <dependencies>
     <dependency>
+    	<groupId>ch.ledcom.agent.jmx</groupId>
+    	<artifactId>jmx-rmi-agent</artifactId>
+    	<version>1.0</version>
+    </dependency>
+    <dependency>
     	<groupId>org.apache.flume</groupId>
     	<artifactId>flume-ng-core</artifactId>
     	<version>1.5.2</version>

@@ -47,21 +47,21 @@ public class WatchDirObserver implements Runnable {
 		return (WatchEvent<T>) event;
 	}
 
-    public WatchDirObserver (String[] dirs) {
+    public WatchDirObserver (String dir) {
     	
     	keys = new HashMap<WatchKey, Path>();
     	listeners = new ArrayList<WatchDirListener>();
     	
-    	for (int i=0;i<dirs.length;i++){
+    	//for (int i=0;i<dirs.length;i++){
     		try {
-    			Path _directotyToWatch = Paths.get(dirs[i]);
+    			Path _directotyToWatch = Paths.get(dir/*[i]*/);
     	        watcherSvc = FileSystems.getDefault().newWatchService();
     	        registerAll(_directotyToWatch);
 
     		} catch (IOException e){
-    			LOGGER.error("No se puede monitorizar el directorio: " + dirs[i]);
+    			LOGGER.error("No se puede monitorizar el directorio: " + dir/*s[i]*/);
     		}
-    	}
+    	//}
     	
     }
 

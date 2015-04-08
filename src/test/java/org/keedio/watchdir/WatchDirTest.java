@@ -37,8 +37,8 @@ public class WatchDirTest {
 		try {
 			// Si no existen listeners sale del hilo
 			File tstFolder = testFolder.newFolder("/tempFolder/");
-			String[] dirs = {tstFolder.getAbsolutePath()};
-			WatchDirObserver monitor = new WatchDirObserver(dirs);
+
+			WatchDirObserver monitor = new WatchDirObserver(tstFolder.getAbsolutePath());
 			monitor.addWatchDirListener(listener);
 			Thread t = new Thread(monitor);
 			t.start();
@@ -65,8 +65,8 @@ public class WatchDirTest {
 		try {
 			// Si no existen listeners sale del hilo
 			File tstFolder = testFolder.newFolder("/tempFolder/");
-			String[] dirs = {tstFolder.getAbsolutePath()};
-			WatchDirObserver monitor = new WatchDirObserver(dirs);
+
+			WatchDirObserver monitor = new WatchDirObserver(tstFolder.getAbsolutePath());
 			Thread t = new Thread(monitor);
 			t.start();
 						
@@ -91,8 +91,8 @@ public class WatchDirTest {
 			// Si no existen listeners sale del hilo
 			File tstFolder1 = testFolder.newFolder("/tempFolder1/");
 			File tstFolder2 = testFolder.newFolder("/tempFolder2/");
-			String[] dirs = {tstFolder1.getAbsolutePath(), tstFolder2.getAbsolutePath()};
-			WatchDirObserver monitor = new WatchDirObserver(dirs);
+
+			WatchDirObserver monitor = new WatchDirObserver(tstFolder1.getAbsolutePath());
 			monitor.addWatchDirListener(listener);
 			Thread t = new Thread(monitor);
 			t.start();
@@ -101,7 +101,7 @@ public class WatchDirTest {
 			testFolder.newFile("tempFolder2/dd.dat");
 			
 			waitFor(20);
-			verify(listener, times(1)).process(any(WatchDirEvent.class));
+			verify(listener, times(0)).process(any(WatchDirEvent.class));
 			
 			// Creamos el fichero en el directorio 2 
 			testFolder.newFile("tempFolder1/dd.dat");

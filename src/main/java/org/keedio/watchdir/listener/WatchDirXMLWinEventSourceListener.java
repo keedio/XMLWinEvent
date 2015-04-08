@@ -60,7 +60,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			.getLogger(WatchDirXMLWinEventSourceListener.class);
 	private String confDirs;
 	private String[] dirs;
-	private WatchDirObserver monitor; 
+	private Set<WatchDirObserver> monitor; 
 	private MetricsController metricsController;
 	
 	
@@ -84,14 +84,20 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	@Override
 	public void start() {
 		LOGGER.info("Source Starting..");
-
+		monitor = new HashSet<WatchDirObserver>();
+		
 		try {
-			monitor = new WatchDirObserver(dirs);
-			monitor.addWatchDirListener(this);
+			for (int i=0;i<dirs.length;i++) {
+				WatchDirObserver aux = new WatchDirObserver(dirs[i]);
+				aux.addWatchDirListener(this);
+
+				Log.debug("Lanzamos el proceso");
+				new Thread(aux).start();
+
+				monitor.add(aux);
+			}
 			metricsController.start();
 			
-			Log.debug("Lanzamos el proceso");
-			new Thread(monitor).start();
 			
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(),e);
