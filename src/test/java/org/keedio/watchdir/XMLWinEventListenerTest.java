@@ -33,7 +33,7 @@ public class XMLWinEventListenerTest {
     private static PrintStream originalStdErr = System.err;
 
     @AfterClass
-    public void restoreStreams(){
+    public static void restoreStreams(){
         System.setOut(originalStdOut);
         System.setErr(originalStdErr);
     }
