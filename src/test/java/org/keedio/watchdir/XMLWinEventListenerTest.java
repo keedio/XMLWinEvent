@@ -11,11 +11,7 @@ import org.apache.flume.Event;
 import org.apache.flume.channel.ChannelProcessor;
 import org.apache.flume.source.AbstractSource;
 import org.hamcrest.CoreMatchers;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.keedio.watchdir.listener.FakeListener;
 import org.keedio.watchdir.listener.XMLWinEventListener;
@@ -32,6 +28,15 @@ public class XMLWinEventListenerTest {
 
 	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 	private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+
+    private static PrintStream originalStdOut = System.out;
+    private static PrintStream originalStdErr = System.err;
+
+    @AfterClass
+    public void restoreStreams(){
+        System.setOut(originalStdOut);
+        System.setErr(originalStdErr);
+    }
 
 	@Before
 	public void setUpStreams() {
