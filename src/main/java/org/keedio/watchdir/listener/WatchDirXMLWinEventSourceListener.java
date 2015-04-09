@@ -18,20 +18,16 @@
  ****************************************************************/
 package org.keedio.watchdir.listener;
 
-import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.file.FileSystems;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
-
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.EventDrivenSource;
@@ -47,7 +43,6 @@ import org.keedio.watchdir.metrics.MetricsEvent;
 import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
 
 public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
