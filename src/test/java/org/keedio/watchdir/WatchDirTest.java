@@ -33,6 +33,8 @@ public class WatchDirTest {
 
     @Test
     public void test() throws IOException, WatchDirException, InterruptedException {
+        System.out.println("Executing test");
+
 
         FakeListener listener = mock(FakeListener.class);
         //doReturn(22).when(listener).process(any(WatchEvent.class));
