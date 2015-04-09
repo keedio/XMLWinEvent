@@ -21,6 +21,11 @@ import org.mockito.Spy;
 import static org.mockito.Mockito.*;
 
 public class WatchDirTest {
+    {
+        System.out.println("Executing test");
+
+    }
+
     private Logger logger = Logger.getLogger("WatchDirTest");
 
     @Rule
@@ -33,7 +38,6 @@ public class WatchDirTest {
 
     @Test
     public void test() throws IOException, WatchDirException, InterruptedException {
-        System.out.println("Executing test");
 
 
         FakeListener listener = mock(FakeListener.class);
