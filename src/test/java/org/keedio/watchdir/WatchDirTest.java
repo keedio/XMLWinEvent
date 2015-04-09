@@ -21,7 +21,7 @@ import org.mockito.Spy;
 import static org.mockito.Mockito.*;
 
 public class WatchDirTest {
-    private Logger logger = Logger.getLogger(getClass());
+    private Logger logger = Logger.getLogger("WatchDirTest");
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder(new File(System.getProperty("java.io.tmpdir")));
