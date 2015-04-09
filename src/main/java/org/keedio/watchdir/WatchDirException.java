@@ -1,8 +1,6 @@
 package org.keedio.watchdir;
 
 public class WatchDirException extends Exception{
-
-	private String exception;
 	
 	public WatchDirException(String message) {
 		super(message);

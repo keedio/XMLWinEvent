@@ -70,6 +70,9 @@ public class XMLWinEventListener implements WatchDirListener{
 			case "ENTRY_CREATE":
 				entryCreate(event);	
 				break;
+			default:
+				LOGGER.info("Nada que hacer con el evento " + event.getType());
+				break;
 		}
 			
 	}
@@ -92,7 +95,7 @@ public class XMLWinEventListener implements WatchDirListener{
 			        String name = elem.getName().getLocalPart();
 
 			        if ("Event".equals(name)) {
-			        	StringBuffer buf = new StringBuffer();
+			        	StringBuilder buf = new StringBuilder();
 			            String xmlFragment = readElementBody(xev);
 			            // lanzamos el evento a la canal flume
 			            buf.append("<Event>").append(xmlFragment).append("</Event>");
@@ -103,7 +106,7 @@ public class XMLWinEventListener implements WatchDirListener{
 			    }			
 			}
 			
-			long intervalo = (new Date().getTime() - inicio.getTime());
+			long intervalo = new Date().getTime() - inicio.getTime();
 			// Se usa el system out para procesar los test de forma correcta
 			System.out.println("Se han procesado " + procesados + " elementos en " + intervalo + " milisegundos");
 			

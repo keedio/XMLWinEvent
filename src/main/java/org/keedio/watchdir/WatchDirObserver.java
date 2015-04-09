@@ -54,9 +54,9 @@ public class WatchDirObserver implements Runnable {
     	listeners = new ArrayList<WatchDirListener>();
     	
 		try {
-			Path _directotyToWatch = Paths.get(dir);
+			Path directotyToWatch = Paths.get(dir);
 	        watcherSvc = FileSystems.getDefault().newWatchService();
-	        registerAll(_directotyToWatch);
+	        registerAll(directotyToWatch);
 
 		} catch (IOException e){
 			LOGGER.info("No se puede monitorizar el directorio: " + dir, e);

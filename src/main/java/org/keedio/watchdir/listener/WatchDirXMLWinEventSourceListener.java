@@ -54,8 +54,6 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		Configurable, EventDrivenSource, WatchDirListener {
 
 	private static final String CONFIG_DIRS = "dirs";
-	private static final String CONFIG_LISTENERS = "listeners";
-
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(WatchDirXMLWinEventSourceListener.class);
 	private String confDirs;
@@ -122,8 +120,10 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			case "ENTRY_CREATE":
 				// Notificamos nuevo fichero creado
 				metricsController.manage(new MetricsEvent(MetricsEvent.NEW_FILE));
-
 				entryCreate(event);	
+				break;
+			default:
+				LOGGER.info("El evento " + event.getPath() + " no se trata.");
 				break;
 		}
 	}
@@ -147,7 +147,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			        String name = elem.getName().getLocalPart();
 
 			        if ("Event".equals(name)) {
-			        	StringBuffer buf = new StringBuffer();
+			        	StringBuilder buf = new StringBuilder();
 			            String xmlFragment = readElementBody(xev);
 			            // lanzamos el evento a la canal flume
 			            buf.append("<Event>").append(xmlFragment).append("</Event>");
@@ -164,7 +164,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			    }			
 			}
 			
-			long intervalo = (new Date().getTime() - inicio.getTime());
+			long intervalo = new Date().getTime() - inicio.getTime();
 			// Se usa el system out para procesar los test de forma correcta
 			System.out.println("Se han procesado " + procesados + " elementos en " + intervalo + " milisegundos");
 
