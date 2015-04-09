@@ -15,7 +15,13 @@ import org.keedio.watchdir.WatchDirListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/**
+ * 
+ * Implementation of a listener waiting creating XML files that follow the standard 
+ * architecture for monitoring events microsoft (WMI standard). The different events 
+ * of the created file (block <<Event>> <</Event>>) are extracted
+ *
+ */
 public class XMLWinEventListener implements WatchDirListener{
 	
 	private AbstractSource flumeSource = null;
@@ -30,7 +36,7 @@ public class XMLWinEventListener implements WatchDirListener{
 		this.flumeSource = flumeSource;
 	}
 
-	public static String readElementBody(XMLEventReader eventReader)
+	private String readElementBody(XMLEventReader eventReader)
 			throws XMLStreamException {
 		StringWriter buf = new StringWriter(1024);
 
