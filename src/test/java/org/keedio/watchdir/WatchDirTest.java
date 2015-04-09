@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 public class WatchDirTest {
 
 	@Rule
-	public TemporaryFolder testFolder = new TemporaryFolder();
+	public TemporaryFolder testFolder = new TemporaryFolder(new File(System.getProperty("java.io.tmpdir")));
 		
 	@Before
 	public void setUp() {
