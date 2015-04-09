@@ -109,7 +109,7 @@ public class XMLWinEventListener implements WatchDirListener{
 			
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 			throw new WatchDirException("Could not process file " + event.getPath());
 		}
 		

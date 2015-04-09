@@ -6,7 +6,9 @@ import java.nio.file.WatchEvent.Kind;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 import org.keedio.watchdir.listener.FakeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +20,9 @@ import static java.nio.file.StandardWatchEventKinds.*;
 public class WatchDirObserver implements Runnable {
 
 	private WatchService watcherSvc;
-	private ArrayList<WatchDirListener> listeners;
+	private List<WatchDirListener> listeners;
 	private static final Logger LOGGER= LoggerFactory
 			.getLogger(WatchDirObserver.class);
-	private String[] dirs; 
 	private final Map<WatchKey, Path> keys;
 	
     static <T> WatchEvent<T> castEvent(WatchEvent<?> event) {
@@ -37,7 +38,7 @@ public class WatchDirObserver implements Runnable {
     		try{
         		listener.process(event);
     		} catch (WatchDirException e) {
-    			LOGGER.error(e.getMessage());
+    			LOGGER.info("Error procesando el listener", e);
     		}
     	}
     }
@@ -52,16 +53,14 @@ public class WatchDirObserver implements Runnable {
     	keys = new HashMap<WatchKey, Path>();
     	listeners = new ArrayList<WatchDirListener>();
     	
-    	//for (int i=0;i<dirs.length;i++){
-    		try {
-    			Path _directotyToWatch = Paths.get(dir);
-    	        watcherSvc = FileSystems.getDefault().newWatchService();
-    	        registerAll(_directotyToWatch);
+		try {
+			Path _directotyToWatch = Paths.get(dir);
+	        watcherSvc = FileSystems.getDefault().newWatchService();
+	        registerAll(_directotyToWatch);
 
-    		} catch (IOException e){
-    			LOGGER.error("No se puede monitorizar el directorio: " + dir);
-    		}
-    	//}
+		} catch (IOException e){
+			LOGGER.info("No se puede monitorizar el directorio: " + dir, e);
+		}
     	
     }
 
@@ -105,7 +104,7 @@ public class WatchDirObserver implements Runnable {
     @Override
 	public void run() {
     	
-    	if (listeners.size() == 0) {
+    	if (listeners.isEmpty()) {
     		LOGGER.error("No existen listeners. Finalizando");
     	} else {
     		try {
@@ -118,7 +117,6 @@ public class WatchDirObserver implements Runnable {
     				Path dir = keys.get(key);
 
     				for (WatchEvent<?> event : key.pollEvents()) {
-    					Kind<?> kind = event.kind();    					
         				WatchEvent<Path> ev = cast(event);
     					Path name = ev.context();
     					Path path = dir.resolve(name);
@@ -135,21 +133,13 @@ public class WatchDirObserver implements Runnable {
     				// reset key and remove from set if directory no longer
     				// accessible
     				key.reset();
-    				/*if (!valid) {
-    					keys.remove(key);
-    					// all directories are inaccessible
-    					if (keys.isEmpty()) {
-    						break;
-    					}
-    				}*/
+
     				Thread.sleep(1000);
     			}
     		} catch (InterruptedException e) {
-    			e.printStackTrace();
+    			LOGGER.info(e.getMessage(), e);
     		} catch (Exception e) {
-    			e.printStackTrace();
-    		} catch (Throwable e) {
-    			e.printStackTrace();
+    			LOGGER.info(e.getMessage(), e);
     		}
     	}
 	}

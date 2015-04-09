@@ -173,7 +173,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			metricsController.manage(new MetricsEvent(MetricsEvent.TOTAL_FILE_EVENTS, procesados));
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 			throw new WatchDirException("Could not process file " + event.getPath());
 		}
 	}
