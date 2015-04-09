@@ -1,5 +1,10 @@
 package org.keedio.watchdir.metrics;
 
+/**
+ * 
+ * Definition of event types used for management by the controller metric metric.
+ *
+ */
 public class MetricsEvent {
 	
 	public static final int NEW_EVENT = 1;

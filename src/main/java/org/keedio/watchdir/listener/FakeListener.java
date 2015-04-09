@@ -6,6 +6,11 @@ import org.keedio.watchdir.WatchDirEvent;
 import org.keedio.watchdir.WatchDirException;
 import org.keedio.watchdir.WatchDirListener;
 
+/**
+ * 
+ * Very simple fake example. Implements WatchDirListener
+ *
+ */
 public class FakeListener implements WatchDirListener {
 
 	@Override

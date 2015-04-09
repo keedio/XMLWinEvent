@@ -16,7 +16,15 @@ import org.slf4j.LoggerFactory;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.nio.file.StandardWatchEventKinds.*;
 
-
+/**
+ * 
+ * This thread monitors the directory indicated in the constructor recursively. 
+ * At the time believed a new file to all 
+ * registered listeners are notified. 
+ * <p>
+ * Events deleted or modified files are not managed.
+ *
+ */
 public class WatchDirObserver implements Runnable {
 
 	private WatchService watcherSvc;
@@ -29,11 +37,15 @@ public class WatchDirObserver implements Runnable {
         return (WatchEvent<T>)event;
     }
     
+    /**
+     * Method used to record listeners. There must be at least one.
+     * @param listener	Must implement WhatchDirListerner. See listeners implementations for more information
+     */
     public void addWatchDirListener(WatchDirListener listener) {
     	listeners.add(listener);
     }
     
-    public void update(WatchDirEvent event) {
+    private void update(WatchDirEvent event) {
     	for (WatchDirListener listener:listeners) {
     		try{
         		listener.process(event);
@@ -66,6 +78,8 @@ public class WatchDirObserver implements Runnable {
 
     /**
      * Register the given directory, and all its sub-directories, with the WatchService.
+     * @param  start	The initial path to monitor. 
+     * 
      */
     private void registerAll(final Path start) throws IOException {
         // register directory and sub-directories

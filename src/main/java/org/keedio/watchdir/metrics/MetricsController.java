@@ -8,6 +8,11 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 
+/**
+*This class represents the controller metrics to publish to the source. 
+*Extends MonitoredCounterGroup class to allow the publication of JMX metrics 
+*following the mechanism established by Flume. 
+*/
 public class MetricsController extends MonitoredCounterGroup implements MetricsMBean {
 
 	private Meter meterEvents;
@@ -29,7 +34,16 @@ public class MetricsController extends MonitoredCounterGroup implements MetricsM
 		totalFileEvents = metrics.histogram("totalFileEvents");
 		
 	}
-	
+
+	/**
+	 * This method manages metric based on events received.
+	 * <p>
+	 * For new metrics will need to create the corresponding event type in 
+	 * MetricsEvent class and then define their behavior here
+	 * @param  event	event to manage
+	 * @return      
+	 * @see        
+	 */
 	public void manage(MetricsEvent event) {
 		switch (event.getCode()) {
 		case MetricsEvent.NEW_FILE:

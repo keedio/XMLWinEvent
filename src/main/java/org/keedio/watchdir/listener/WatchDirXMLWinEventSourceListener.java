@@ -45,6 +45,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 
+/**
+ * 
+ * Implementation of a source of flume that consumes XML files that follow 
+ * the standard architecture for monitoring events microsoft (WMI standard). 
+ * <p>
+ * The different events of the created file (block <Event> </ Event>) are extracted and 
+ * sent to the corresponding channel.
+ *
+ */
 public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		Configurable, EventDrivenSource, WatchDirListener {
 
@@ -173,7 +182,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		}
 	}
 
-	public static String readElementBody(XMLEventReader eventReader)
+	private String readElementBody(XMLEventReader eventReader)
 			throws XMLStreamException {
 		StringWriter buf = new StringWriter(1024);
 

@@ -1,5 +1,10 @@
 package org.keedio.watchdir;
 
+/**
+ * 
+ * This event includes the path of the file created.
+ *
+ */
 public class WatchDirEvent {
 
 	private String type;
