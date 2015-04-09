@@ -10,6 +10,11 @@ public class WatchDirEvent {
 	private String type;
 	private String path;
 	
+	public WatchDirEvent(String path, String type) {
+		this.type = type;
+		this.path = path;
+	}
+	
 	public String getType() {
 		return type;
 	}
@@ -23,11 +28,6 @@ public class WatchDirEvent {
 	}
 
 	public void setPath(String path) {
-		this.path = path;
-	}
-	
-	public WatchDirEvent(String path, String type) {
-		this.type = type;
 		this.path = path;
 	}
 	

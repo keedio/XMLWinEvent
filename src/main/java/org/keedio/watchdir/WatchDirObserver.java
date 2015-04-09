@@ -2,17 +2,13 @@ package org.keedio.watchdir;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.nio.file.WatchEvent.Kind;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.keedio.watchdir.listener.FakeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -33,6 +29,22 @@ public class WatchDirObserver implements Runnable {
 			.getLogger(WatchDirObserver.class);
 	private final Map<WatchKey, Path> keys;
 	
+    public WatchDirObserver (String dir) {
+    	
+    	keys = new HashMap<WatchKey, Path>();
+    	listeners = new ArrayList<WatchDirListener>();
+    	
+		try {
+			Path directotyToWatch = Paths.get(dir);
+	        watcherSvc = FileSystems.getDefault().newWatchService();
+	        registerAll(directotyToWatch);
+
+		} catch (IOException e){
+			LOGGER.info("No se puede monitorizar el directorio: " + dir, e);
+		}
+    	
+    }
+
     static <T> WatchEvent<T> castEvent(WatchEvent<?> event) {
         return (WatchEvent<T>)event;
     }
@@ -59,22 +71,6 @@ public class WatchDirObserver implements Runnable {
 	static <T> WatchEvent<T> cast(WatchEvent<?> event) {
 		return (WatchEvent<T>) event;
 	}
-
-    public WatchDirObserver (String dir) {
-    	
-    	keys = new HashMap<WatchKey, Path>();
-    	listeners = new ArrayList<WatchDirListener>();
-    	
-		try {
-			Path directotyToWatch = Paths.get(dir);
-	        watcherSvc = FileSystems.getDefault().newWatchService();
-	        registerAll(directotyToWatch);
-
-		} catch (IOException e){
-			LOGGER.info("No se puede monitorizar el directorio: " + dir, e);
-		}
-    	
-    }
 
     /**
      * Register the given directory, and all its sub-directories, with the WatchService.
