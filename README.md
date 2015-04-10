@@ -5,14 +5,14 @@ The XML files must be well formed following next schema:
 
 ```
 <xml ...>
-<Evetns>
-<Event>
-....
-</ Event>
-<Event>
-....
-</ Event>
-</ Events>
+  <Events>
+    <Event>
+      ....
+    </ Event>
+    <Event>
+      ....
+    </ Event>
+  </ Events>
 ```
 
 The source is responsible for injecting into the flume channel type events
