@@ -12,7 +12,7 @@ The XML files must be well formed following next schema:
     <Event>
       ....
     </ Event>
-  </ Events>
+  </Events>
 ```
 
 The source is responsible for injecting into the flume channel type events
@@ -20,7 +20,7 @@ The source is responsible for injecting into the flume channel type events
 ```
 <Event>
 ...
-</ Event>
+</Event>
 ```
 
 Notes
@@ -53,7 +53,7 @@ Configuration
 ```
 ...
 flume.sources.r1.type = org.keedio.watchdir.listener.WatchDirXMLWinEventSourceListener
-flume.sources.r1.dirs = /tmp/rolmo
+flume.sources.r1.dirs = /tmp/dir1,/tmp/dir2
 ...
 ```
 
