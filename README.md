@@ -1,6 +1,27 @@
 XML Windows Event Source for Flume
 ==================================
-Source of Flume NG for tailing files in a directory which has windows event xml format.
+Source of Flume NG for tailing files in a directory which has windows event xml format. Directories to monitor can be configured and flume will be responsible for monitoring these directories recursively waiting for **only new** files.
+The XML files must be well formed following next schema:
+
+```
+<xml ...>
+<Evetns>
+<Event>
+....
+</ Event>
+<Event>
+....
+</ Event>
+</ Events>
+```
+
+The source is responsible for injecting into the flume channel type events
+
+```
+<Event>
+...
+</ Event>
+```
 
 Notes
 =====
