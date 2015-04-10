@@ -15,7 +15,7 @@ The XML files must be well formed following next schema:
   </Events>
 ```
 
-The source is responsible for injecting into the flume channel type events
+The source is responsible for injecting into the flume channel the each Event section:
 
 ```
 <Event>
