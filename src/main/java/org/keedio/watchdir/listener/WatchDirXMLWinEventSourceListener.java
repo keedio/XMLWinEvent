@@ -66,6 +66,14 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	private MetricsController metricsController;
 	
 	
+	public Set<WatchDirObserver> getMonitor() {
+		return monitor;
+	}
+
+	public void setMonitor(Set<WatchDirObserver> monitor) {
+		this.monitor = monitor;
+	}
+
 	@Override
 	public void configure(Context context) {
 		LOGGER.info("Source Configuring..");
