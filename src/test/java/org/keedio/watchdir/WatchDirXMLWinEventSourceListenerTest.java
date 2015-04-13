@@ -1,4 +1,4 @@
-package org.keedio.watchdir.metrics;
+package org.keedio.watchdir;
 
 import java.io.File;
 import java.io.IOException;
