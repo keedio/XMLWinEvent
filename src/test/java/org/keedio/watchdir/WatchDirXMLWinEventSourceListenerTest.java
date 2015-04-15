@@ -60,6 +60,10 @@ public class WatchDirXMLWinEventSourceListenerTest {
 		context.put("keep-alive", "1");
 		context.put("capacity", "100000");
 		context.put("transactionCapacity", "100000");
+		context.put("blacklist", "");
+		context.put("whitelist", "");
+		context.put("tag", "event");
+		context.put("taglevel", "2");
 
 		Configurables.configure(listener, context);
 		Configurables.configure(channel, context);
@@ -97,7 +101,7 @@ public class WatchDirXMLWinEventSourceListenerTest {
 			
 
             // Creamos el fichero en el directorio 1
-        	FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp1/test.xml"));
+        	FileUtils.copyFile(new File("src/test/resources/nested.xml"), testFolder.newFile("tmp1/nested.xml"));
 
             Thread.sleep(20000);
             verify(mock, times(1)).process(any(WatchDirEvent.class));

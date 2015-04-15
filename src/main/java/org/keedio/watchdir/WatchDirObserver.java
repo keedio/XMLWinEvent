@@ -7,8 +7,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -28,9 +32,13 @@ public class WatchDirObserver implements Runnable {
 	private static final Logger LOGGER= LoggerFactory
 			.getLogger(WatchDirObserver.class);
 	private final Map<WatchKey, Path> keys;
+	private String blacklist = "";
+	private String whitelist = "";
 	
-    public WatchDirObserver (String dir) {
+    public WatchDirObserver (String dir, String whitelist, String blacklist) {
     	
+    	this.blacklist = blacklist;
+    	this.whitelist = whitelist;
     	keys = new HashMap<WatchKey, Path>();
     	listeners = new ArrayList<WatchDirListener>();
     	
@@ -134,9 +142,24 @@ public class WatchDirObserver implements Runnable {
     					// Si se crea un nuevo directorio es necesario registrarlo de nuevo
     					if (Files.isDirectory(path, NOFOLLOW_LINKS))
     						registerAll(path);
-    					else
-    						// En caso contrario notificamos el cambio sobre el fichero
-    						update(new WatchDirEvent(path.toString(), event.kind().name()));
+    					else {
+    						if (blacklist.isEmpty() && whitelist.isEmpty()){
+    							// Si las dos listas estan vacias notificamos
+        						update(new WatchDirEvent(path.toString(), event.kind().name()));    							
+    						} else {
+    							// En caso contrario
+        						// Comprobamos si esta en la blacklist
+        						if (!whitelist.isEmpty() && match(whitelist, path.toString())){
+        							LOGGER.debug("Whitelisted. Go on");
+        							update(new WatchDirEvent(path.toString(), event.kind().name()));
+        							break;
+        						} else if (!blacklist.isEmpty() && !match(blacklist, path.toString())) {
+        							LOGGER.debug("Not in blacklisted. Go on");
+        							update(new WatchDirEvent(path.toString(), event.kind().name()));
+        							break;
+        						}
+    						}
+    					}
     					
     				}
 
@@ -153,5 +176,23 @@ public class WatchDirObserver implements Runnable {
     		}
     	}
 	}
+    
+    public static boolean match(String patterns, String string) {
+    	
+    	String[] splitPat = patterns.split(",");
+    	boolean match = false;
+    	
+    	for (String pattern:splitPat) {
+        	Pattern pat = Pattern.compile(pattern + "$");
+        	Matcher mat = pat.matcher(string);
+        	
+        	match = match || mat.find();
+        	
+        	if (match) break;
+    	}
+    	
+    	
+    	return match;
+    }
 
 }

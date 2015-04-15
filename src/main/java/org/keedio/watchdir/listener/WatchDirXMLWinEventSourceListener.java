@@ -22,12 +22,15 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
+
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.EventDrivenSource;
@@ -43,6 +46,7 @@ import org.keedio.watchdir.metrics.MetricsEvent;
 import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 
 /**
@@ -58,13 +62,20 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		Configurable, EventDrivenSource, WatchDirListener {
 
 	private static final String CONFIG_DIRS = "dirs";
+	private static final String WHITELIST = "whitelist";
+	private static final String BLACKLIST = "blacklist";
+	private static final String TAGNAME = "tag";
+	private static final String TAGLEVEL = "taglevel";
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(WatchDirXMLWinEventSourceListener.class);
 	private String confDirs;
 	private String[] dirs;
+	private String whitelist;
+	private String blacklist;
 	private Set<WatchDirObserver> monitor; 
 	private MetricsController metricsController;
-	
+	private String tagName;
+	private int tagLevel;
 	
 	public Set<WatchDirObserver> getMonitor() {
 		return monitor;
@@ -89,6 +100,16 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		Preconditions.checkState(dirs.length > 0, CONFIG_DIRS
 				+ " must be specified at least one.");		
 
+		whitelist = context.getString(WHITELIST);
+		whitelist=(whitelist==null)?"":whitelist;
+		blacklist = context.getString(BLACKLIST);
+		blacklist=(blacklist==null)?"":blacklist;
+		tagName = context.getString(TAGNAME);
+		tagLevel = Integer.parseInt(context.getString(TAGLEVEL));
+
+		Preconditions.checkState(tagName != null, TAGNAME
+				+ " must be specified.");		
+
 	}
 
 	@Override
@@ -98,7 +119,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		
 		try {
 			for (int i=0;i<dirs.length;i++) {
-				WatchDirObserver aux = new WatchDirObserver(dirs[i]);
+				WatchDirObserver aux = new WatchDirObserver(dirs[i], whitelist, blacklist);
 				aux.addWatchDirListener(this);
 
 				Log.debug("Lanzamos el proceso");
@@ -144,6 +165,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 
 		try {
 			
+			int level = 0;
 			Date inicio = new Date();
 			int procesados = 0;
 			XMLInputFactory xif = XMLInputFactory.newInstance();
@@ -158,22 +180,37 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			        StartElement elem = xmlEvent.asStartElement();
 			        String name = elem.getName().getLocalPart();
 
-			        if ("Event".equals(name)) {
-			        	StringBuilder buf = new StringBuilder();
-			            String xmlFragment = readElementBody(xev);
-			            // lanzamos el evento a la canal flume
-			            buf.append("<Event>").append(xmlFragment).append("</Event>");
-			            
-			            procesados++;
-			            
-			    		Event ev = EventBuilder.withBody(String.valueOf(buf).getBytes());
-			    		getChannelProcessor().processEvent(ev);
-			            
-			    		// Notificamos un evento de nuevo mensaje
-			    		metricsController.manage(new MetricsEvent(MetricsEvent.NEW_EVENT));
+			        if (tagName.equals(name)) {
+			        	level++;
+			        	
+			        	if (level == tagLevel) {
+				        	StringBuilder buf = new StringBuilder();
+				            String xmlFragment = readElementBody(xev);
+				            // lanzamos el evento a la canal flume
+				            buf.append("<" + tagName + ">").append(xmlFragment).append("</" + tagName + ">");
+				            
+				            procesados++;
+				            
+				    		Event ev = EventBuilder.withBody(String.valueOf(buf).getBytes());
+				    		getChannelProcessor().processEvent(ev);
+				            
+				    		// Notificamos un evento de nuevo mensaje
+				    		metricsController.manage(new MetricsEvent(MetricsEvent.NEW_EVENT));
+			        	} else {
+			        		LOGGER.debug("Watiing for proper level");
+			        	}
 			            
 			        }
 			    }			
+			    if (xmlEvent.isEndElement()) {
+			        EndElement elem = xmlEvent.asEndElement();
+			        String name = elem.getName().getLocalPart();
+
+			        if (tagName.equals(name)) {
+			        	level--;
+			        }
+			    }			
+
 			}
 			
 			long intervalo = new Date().getTime() - inicio.getTime();
