@@ -2,6 +2,8 @@ package org.keedio.watchdir;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -173,6 +175,27 @@ public class WatchDirXMLWinEventSourceListenerTest {
             e.printStackTrace();
             Assert.fail();
         }
+		
+	}
+	
+	@Test
+	public void testMappingConvertion() {
+		
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("1.1", "1.1");
+		map.put("1.2", "1.2");
+		map.put("1.3", "1.3");
+		map.put("1.4", "1.4");
+		map.put("2.1", "2.1");
+		map.put("2.2", "2.2");
+		map.put("2.3", "2.3");
+		map.put("2.4", "2.4");
+		
+		Map test = WatchDirXMLWinEventSourceListener.getMapProperties(map);
+		
+		Assert.assertTrue("La tabla tiene dos elementos", test.size() == 2);
+		String str = ((Map<String, String>)test.get("2")).get("3");
+		Assert.assertTrue("El elemento 2, 3", "2.3".equals(str));
 		
 	}
 

@@ -125,7 +125,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 
 	}
 	
-	private static Map<String, Map<String, String>> getMapProperties(Map<String, String> all) {
+	public static Map<String, Map<String, String>> getMapProperties(Map<String, String> all) {
 		
 		Map<String, Map<String, String>> map = new HashMap<String, Map<String,String>>();
 		Iterator<String> it = all.keySet().iterator();
