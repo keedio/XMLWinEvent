@@ -61,3 +61,11 @@ flume.sources.r1.dirs.whitelist =
 flume.sources.r1.dirs.maxworkers =
 ...
 ```
+
+Test
+====
+There is a test plan available in https://drive.google.com/open?id=1pigZkPsTM1wWA8c8JkhXiAvVG_edRISsneJOUTr_wbk&authuser=0
+
+TODO
+====
+Read files on flume startup
