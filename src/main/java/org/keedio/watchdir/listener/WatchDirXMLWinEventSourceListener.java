@@ -75,18 +75,16 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	private static final String BLACKLIST = "blacklist";
 	private static final String TAGNAME = "tag";
 	private static final String TAGLEVEL = "taglevel";
+	private static final String MAX_WORKERS = "maxworkers";
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(WatchDirXMLWinEventSourceListener.class);
 	private ExecutorService executor;
 	private String confDirs;
 	private String[] dirs;
-	//protected String whitelist;
-	//protected String blacklist;
 	private Set<WatchDirObserver> monitor; 
 	private MetricsController metricsController;
-	//protected String tagName;
-	//protected int tagLevel;
 	private Set<WatchDirFileSet> fileSets;
+	private int maxWorkers = 10;
 	
 	public synchronized MetricsController getMetricsController() {
 		return metricsController;
@@ -111,6 +109,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		
 		String globalWhiteList = context.getString(WHITELIST);
 		String globalBlackList = context.getString(BLACKLIST);
+		maxWorkers = context.getString(MAX_WORKERS)==null?10:Integer.parseInt(context.getString(MAX_WORKERS));
 		
 		// Creamos los filesets
 		fileSets = new HashSet<WatchDirFileSet>();
@@ -155,7 +154,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	@Override
 	public void start() {
 		LOGGER.info("Source Starting..");
-		executor = Executors.newFixedThreadPool(10);
+		executor = Executors.newFixedThreadPool(maxWorkers);
 		monitor = new HashSet<WatchDirObserver>();
 		
 		try {
