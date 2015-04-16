@@ -32,25 +32,21 @@ public class WatchDirObserver implements Runnable {
 	private static final Logger LOGGER= LoggerFactory
 			.getLogger(WatchDirObserver.class);
 	private final Map<WatchKey, Path> keys;
-	private String blacklist = "";
-	private String whitelist = "";
+	private WatchDirFileSet set;
 	
-    public WatchDirObserver (String dir, String whitelist, String blacklist) {
-    	
-    	this.blacklist = blacklist;
-    	this.whitelist = whitelist;
+    public WatchDirObserver(WatchDirFileSet set) {
+    	this.set = set;
     	keys = new HashMap<WatchKey, Path>();
     	listeners = new ArrayList<WatchDirListener>();
     	
 		try {
-			Path directotyToWatch = Paths.get(dir);
+			Path directotyToWatch = Paths.get(set.getPath());
 	        watcherSvc = FileSystems.getDefault().newWatchService();
 	        registerAll(directotyToWatch);
 
 		} catch (IOException e){
-			LOGGER.info("No se puede monitorizar el directorio: " + dir, e);
+			LOGGER.info("No se puede monitorizar el directorio: " + set.getPath(), e);
 		}
-    	
     }
 
     static <T> WatchEvent<T> castEvent(WatchEvent<?> event) {
@@ -143,19 +139,19 @@ public class WatchDirObserver implements Runnable {
     					if (Files.isDirectory(path, NOFOLLOW_LINKS))
     						registerAll(path);
     					else {
-    						if (blacklist.isEmpty() && whitelist.isEmpty()){
+    						if (set.getWhitelist().isEmpty() && set.getBlacklist().isEmpty()){
     							// Si las dos listas estan vacias notificamos
-        						update(new WatchDirEvent(path.toString(), event.kind().name()));    							
+        						update(new WatchDirEvent(path.toString(), event.kind().name(), set));    							
     						} else {
     							// En caso contrario
         						// Comprobamos si esta en la blacklist
-        						if (!whitelist.isEmpty() && match(whitelist, path.toString())){
+        						if (!set.getWhitelist().isEmpty() && match(set.getWhitelist(), path.toString())){
         							LOGGER.debug("Whitelisted. Go on");
-        							update(new WatchDirEvent(path.toString(), event.kind().name()));
+        							update(new WatchDirEvent(path.toString(), event.kind().name(), set));
         							break;
-        						} else if (!blacklist.isEmpty() && !match(blacklist, path.toString())) {
+        						} else if (!set.getBlacklist().isEmpty() && !match(set.getBlacklist(), path.toString())) {
         							LOGGER.debug("Not in blacklisted. Go on");
-        							update(new WatchDirEvent(path.toString(), event.kind().name()));
+        							update(new WatchDirEvent(path.toString(), event.kind().name(), set));
         							break;
         						}
     						}

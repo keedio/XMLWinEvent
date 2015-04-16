@@ -19,9 +19,16 @@
 package org.keedio.watchdir.listener;
 
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -39,6 +46,7 @@ import org.apache.flume.event.EventBuilder;
 import org.apache.flume.source.AbstractSource;
 import org.keedio.watchdir.WatchDirEvent;
 import org.keedio.watchdir.WatchDirException;
+import org.keedio.watchdir.WatchDirFileSet;
 import org.keedio.watchdir.WatchDirListener;
 import org.keedio.watchdir.WatchDirObserver;
 import org.keedio.watchdir.metrics.MetricsController;
@@ -61,22 +69,29 @@ import com.google.common.base.Preconditions;
 public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		Configurable, EventDrivenSource, WatchDirListener {
 
-	private static final String CONFIG_DIRS = "dirs";
+	private static final String CONFIG_DIRS = "dirs.";
+	private static final String DIR = "dir";
 	private static final String WHITELIST = "whitelist";
 	private static final String BLACKLIST = "blacklist";
 	private static final String TAGNAME = "tag";
 	private static final String TAGLEVEL = "taglevel";
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(WatchDirXMLWinEventSourceListener.class);
+	private ExecutorService executor;
 	private String confDirs;
 	private String[] dirs;
-	private String whitelist;
-	private String blacklist;
+	//protected String whitelist;
+	//protected String blacklist;
 	private Set<WatchDirObserver> monitor; 
 	private MetricsController metricsController;
-	private String tagName;
-	private int tagLevel;
+	//protected String tagName;
+	//protected int tagLevel;
+	private Set<WatchDirFileSet> fileSets;
 	
+	public synchronized MetricsController getMetricsController() {
+		return metricsController;
+	}
+
 	public Set<WatchDirObserver> getMonitor() {
 		return monitor;
 	}
@@ -89,37 +104,66 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	public void configure(Context context) {
 		LOGGER.info("Source Configuring..");
 
-		confDirs = context.getString(CONFIG_DIRS).trim();
-		Preconditions.checkState(confDirs != null,
-				"Configuration must be specified directory(ies).");
-
-
-		dirs = context.getString(CONFIG_DIRS).split(",");
 		metricsController = new MetricsController();
 		
-		Preconditions.checkState(dirs.length > 0, CONFIG_DIRS
-				+ " must be specified at least one.");		
+		Map<String, String> criterias = context.getSubProperties(CONFIG_DIRS);
+		Map getCriterias = getMapProperties(criterias);
+		
+		String globalWhiteList = context.getString(WHITELIST);
+		String globalBlackList = context.getString(BLACKLIST);
+		
+		// Creamos los filesets
+		fileSets = new HashSet<WatchDirFileSet>();
+		Iterator it = getCriterias.keySet().iterator();
+		while (it.hasNext()) {
+			Map<String, String> aux = (Map<String, String>)getCriterias.get(it.next());
+			WatchDirFileSet auxSet = new WatchDirFileSet(aux.get(DIR), aux.get(TAGNAME), Integer.parseInt(aux.get(TAGLEVEL)), globalWhiteList!=null?globalWhiteList:aux.get(WHITELIST), globalBlackList!=null?globalBlackList:aux.get(BLACKLIST));
+			
+			fileSets.add(auxSet);
+		}
 
-		whitelist = context.getString(WHITELIST);
-		whitelist=(whitelist==null)?"":whitelist;
-		blacklist = context.getString(BLACKLIST);
-		blacklist=(blacklist==null)?"":blacklist;
-		tagName = context.getString(TAGNAME);
-		tagLevel = Integer.parseInt(context.getString(TAGLEVEL));
+		Preconditions.checkState(fileSets.size() > 0, "Bad configuration, review documentation on https://github.com/keedio/XMLWinEvent/blob/master/README.md");	
 
-		Preconditions.checkState(tagName != null, TAGNAME
-				+ " must be specified.");		
-
+	}
+	
+	private static Map<String, Map<String, String>> getMapProperties(Map<String, String> all) {
+		
+		Map<String, Map<String, String>> map = new HashMap<String, Map<String,String>>();
+		Iterator<String> it = all.keySet().iterator();
+		
+		while(it.hasNext()){
+			String key = it.next();
+			String[]aux = key.split("\\.");
+			String mapKey = aux[0];
+			String auxKey = aux[1];
+			String auxValue = all.get(key);
+			
+			if (!map.containsKey(mapKey)) {
+				HashMap<String, String> auxMap = new HashMap<String, String>();
+				auxMap.put(auxKey, auxValue);
+				
+				map.put(mapKey, auxMap);
+			} else {
+				map.get(mapKey).put(auxKey, auxValue);
+			}
+					
+		}
+		
+		return map;
 	}
 
 	@Override
 	public void start() {
 		LOGGER.info("Source Starting..");
+		executor = Executors.newFixedThreadPool(10);
 		monitor = new HashSet<WatchDirObserver>();
 		
 		try {
-			for (int i=0;i<dirs.length;i++) {
-				WatchDirObserver aux = new WatchDirObserver(dirs[i], whitelist, blacklist);
+			Iterator<WatchDirFileSet> it = fileSets.iterator();
+			
+			while(it.hasNext()) {
+//				WatchDirObserver aux = new WatchDirObserver(dirs[i], whitelist, blacklist);
+				WatchDirObserver aux = new WatchDirObserver(it.next());
 				aux.addWatchDirListener(this);
 
 				Log.debug("Lanzamos el proceso");
@@ -140,6 +184,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	@Override
 	public void stop() {
 		LOGGER.info("Stopping source");
+		executor.shutdown();
 		metricsController.stop();
 		super.stop();
 	}
@@ -153,7 +198,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			case "ENTRY_CREATE":
 				// Notificamos nuevo fichero creado
 				metricsController.manage(new MetricsEvent(MetricsEvent.NEW_FILE));
-				entryCreate(event);	
+				executor.submit(new WatchDirXMLWinWorker(this, event));
 				break;
 			default:
 				LOGGER.info("El evento " + event.getPath() + " no se trata.");
@@ -161,101 +206,4 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		}
 	}
 	
-	private void entryCreate(WatchDirEvent event) throws WatchDirException {
-
-		try {
-			
-			int level = 0;
-			Date inicio = new Date();
-			int procesados = 0;
-			XMLInputFactory xif = XMLInputFactory.newInstance();
-			xif.setProperty("javax.xml.stream.isNamespaceAware", false);
-
-			StreamSource source = new StreamSource(event.getPath());
-			XMLEventReader xev = xif.createXMLEventReader(source);
-			
-			while (xev.hasNext()) {
-			    XMLEvent xmlEvent = xev.nextEvent();
-			    if (xmlEvent.isStartElement()) {
-			        StartElement elem = xmlEvent.asStartElement();
-			        String name = elem.getName().getLocalPart();
-
-			        if (tagName.equals(name)) {
-			        	level++;
-			        	
-			        	if (level == tagLevel) {
-				        	StringBuilder buf = new StringBuilder();
-				            String xmlFragment = readElementBody(xev);
-				            // lanzamos el evento a la canal flume
-				            buf.append("<" + tagName + ">").append(xmlFragment).append("</" + tagName + ">");
-				            
-				            procesados++;
-				            
-				    		Event ev = EventBuilder.withBody(String.valueOf(buf).getBytes());
-				    		getChannelProcessor().processEvent(ev);
-				            
-				    		// Notificamos un evento de nuevo mensaje
-				    		metricsController.manage(new MetricsEvent(MetricsEvent.NEW_EVENT));
-			        	} else {
-			        		LOGGER.debug("Watiing for proper level");
-			        	}
-			            
-			        }
-			    }			
-			    if (xmlEvent.isEndElement()) {
-			        EndElement elem = xmlEvent.asEndElement();
-			        String name = elem.getName().getLocalPart();
-
-			        if (tagName.equals(name)) {
-			        	level--;
-			        }
-			    }			
-
-			}
-			
-			long intervalo = new Date().getTime() - inicio.getTime();
-			// Se usa el system out para procesar los test de forma correcta
-			System.out.println("Se han procesado " + procesados + " elementos en " + intervalo + " milisegundos");
-
-			// Notificamos el tiempo de procesado para las metricas
-			metricsController.manage(new MetricsEvent(MetricsEvent.MEAN_FILE_PROCESS, intervalo));
-			metricsController.manage(new MetricsEvent(MetricsEvent.TOTAL_FILE_EVENTS, procesados));
-			
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
-			throw new WatchDirException("Could not process file " + event.getPath());
-		}
-	}
-
-	private String readElementBody(XMLEventReader eventReader)
-			throws XMLStreamException {
-		StringWriter buf = new StringWriter(1024);
-
-		int depth = 0;
-		while (eventReader.hasNext()) {
-			// peek event
-			XMLEvent xmlEvent = eventReader.peek();
-
-			if (xmlEvent.isStartElement()) {
-				++depth;
-			}
-			else if (xmlEvent.isEndElement()) {
-				--depth;
-
-				// reached END_ELEMENT tag?
-						// break loop, leave event in stream
-				if (depth < 0)
-					break;
-			}
-
-			// consume event
-			xmlEvent = eventReader.nextEvent();
-
-			// print out event
-			xmlEvent.writeAsEncodedUnicode(buf);
-		}
-
-		return buf.getBuffer().toString();
-	}
-
 }

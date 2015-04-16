@@ -49,7 +49,8 @@ public class WatchDirTest {
         File tstFolder = testFolder.newFolder("/tempFolder/");
         logger.info("tstFolder created");
 
-        WatchDirObserver monitor = new WatchDirObserver(tstFolder.getAbsolutePath(), whitelist, blacklist);
+        WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+        WatchDirObserver monitor = new WatchDirObserver(set);
         logger.info("WatchDirObserver created");
 
         monitor.addWatchDirListener(listener);
@@ -79,7 +80,8 @@ public class WatchDirTest {
             // Si no existen listeners sale del hilo
             File tstFolder = testFolder.newFolder("/tempFolder/");
 
-            WatchDirObserver monitor = new WatchDirObserver(tstFolder.getAbsolutePath(), whitelist, blacklist);
+            WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+            WatchDirObserver monitor = new WatchDirObserver(set);
             Thread t = new Thread(monitor);
             t.start();
 
@@ -109,7 +111,8 @@ public class WatchDirTest {
             File tstFolder1 = testFolder.newFolder("/tempFolder1/");
             File tstFolder2 = testFolder.newFolder("/tempFolder2/");
 
-            WatchDirObserver monitor = new WatchDirObserver(tstFolder1.getAbsolutePath(), whitelist, blacklist);
+            WatchDirFileSet set = new WatchDirFileSet(tstFolder1.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+            WatchDirObserver monitor = new WatchDirObserver(set);
             monitor.addWatchDirListener(listener);
             Thread t = new Thread(monitor);
             t.start();
@@ -148,7 +151,8 @@ public class WatchDirTest {
         File tstFolder = testFolder.newFolder("/tempFolder/");
         logger.info("tstFolder created");
 
-        WatchDirObserver monitor = new WatchDirObserver(tstFolder.getAbsolutePath(), whitelist, blacklist);
+        WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+        WatchDirObserver monitor = new WatchDirObserver(set);
         logger.info("WatchDirObserver created");
 
         monitor.addWatchDirListener(listener);
@@ -178,7 +182,8 @@ public class WatchDirTest {
         File tstFolder = testFolder.newFolder("/tempFolder/");
         logger.info("tstFolder created");
 
-        WatchDirObserver monitor = new WatchDirObserver(tstFolder.getAbsolutePath(), whitelist, blacklist);
+        WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+        WatchDirObserver monitor = new WatchDirObserver(set);
         logger.info("WatchDirObserver created");
 
         monitor.addWatchDirListener(listener);
@@ -208,7 +213,8 @@ public class WatchDirTest {
         File tstFolder = testFolder.newFolder("/tempFolder/");
         logger.info("tstFolder created");
 
-        WatchDirObserver monitor = new WatchDirObserver(tstFolder.getAbsolutePath(), whitelist, blacklist);
+        WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+        WatchDirObserver monitor = new WatchDirObserver(set);
         logger.info("WatchDirObserver created");
 
         monitor.addWatchDirListener(listener);
@@ -238,7 +244,8 @@ public class WatchDirTest {
         File tstFolder = testFolder.newFolder("/tempFolder/");
         logger.info("tstFolder created");
 
-        WatchDirObserver monitor = new WatchDirObserver(tstFolder.getAbsolutePath(), whitelist, blacklist);
+        WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+        WatchDirObserver monitor = new WatchDirObserver(set);
         logger.info("WatchDirObserver created");
 
         monitor.addWatchDirListener(listener);

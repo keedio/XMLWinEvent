@@ -55,15 +55,18 @@ public class WatchDirXMLWinEventSourceListenerTest {
 		
 		Channel channel = new MemoryChannel();
 		Context context = new Context();
-		context.put("dirs", tstFolder1.getAbsolutePath() + "," + tstFolder2.getAbsolutePath());
+		context.put("dirs.1.dir", tstFolder1.getAbsolutePath());
+		context.put("dirs.1.tag", "event");
+		context.put("dirs.1.taglevel", "2");
+		context.put("dirs.2.dir", tstFolder2.getAbsolutePath());
+		context.put("dirs.2.tag", "event");
+		context.put("dirs.2.taglevel", "2");
 		context.put("event.terminator", "|#]");
 		context.put("keep-alive", "1");
 		context.put("capacity", "100000");
 		context.put("transactionCapacity", "100000");
 		context.put("blacklist", "");
 		context.put("whitelist", "");
-		context.put("tag", "event");
-		context.put("taglevel", "2");
 
 		Configurables.configure(listener, context);
 		Configurables.configure(channel, context);
