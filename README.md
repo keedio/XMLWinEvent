@@ -62,7 +62,12 @@ flume.sources.r1.dirs.maxworkers =
 ...
 ```
 
+TEST
+====
+
+There is a test plan available on https://drive.google.com/open?id=1WqIOZU5z-iOvCEfbtAgdOGyJ0DrEpumrjcMSY-ktZXQ&authuser=0
 
 TODO
 ====
-Read files on flume startup
+
+-Read files on flume startup
