@@ -1,5 +1,16 @@
 package org.keedio.watchdir;
 
+/**
+ * Thos class include characteristics of the file to be monitorized:
+ * Path, path of the directory 
+ * Tag name, name of tag expected to be in the xml files
+ * Tag level, level of tag expected to be in the xml files
+ * Whitelist, files to monitorize
+ * Blacklist, excluded files
+ * 
+ * @author rolmo
+ *
+ */
 public class WatchDirFileSet {
 	
 	private String path;

@@ -2,7 +2,7 @@ package org.keedio.watchdir;
 
 /**
  * 
- * This event includes the path of the file created.
+ * Events to be launch between components
  *
  */
 public class WatchDirEvent {

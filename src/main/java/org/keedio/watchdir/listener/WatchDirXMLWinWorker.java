@@ -16,6 +16,11 @@ import org.keedio.watchdir.metrics.MetricsEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This worker proccess the xml file in order to extract the expeted events.
+ * @author rolmo
+ *
+ */
 public class WatchDirXMLWinWorker implements Runnable {
 
 	private static final Logger LOGGER = LoggerFactory
