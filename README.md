@@ -19,7 +19,7 @@ mvn clean package
 
 Use
 ===
-Make the directory in flume installation path ```$FLUME_HOME/plugins.d/xmlwinevent/lib``` and copy the file   ```xmlwineventsource-1.0.0.jar``` in it.  
+Make the directory in flume installation path ```$FLUME_HOME/plugins.d/xmlwinevent/lib``` and copy the file   ```xmlwineventsource-{version}.jar``` in it.  
 Edit flume configuration file with the parameters above.
 
 Configuration
