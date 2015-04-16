@@ -1,39 +1,20 @@
 XML Windows Event Source for Flume
 ==================================
-Source of Flume NG for tailing files in a directory which has windows event xml format. Directories to monitor can be configured and flume will be responsible for monitoring these directories recursively waiting for **only new** files.
-The XML files must be well formed following next schema:
+Source of Flume NG for tailing xml files in a directory. Directories to monitor can be configured and flume will be responsible for monitoring these directories recursively waiting for **only new** files.
+The XML files must be well formed. You should specify the xml tag and level in the schema from which event to inyect to channel is condidered. The source is responsible for injecting into the flume channel.
 
-```
-<xml ...>
-  <Events>
-    <Event>
-      ....
-    </ Event>
-    <Event>
-      ....
-    </ Event>
-  </Events>
-```
-
-The source is responsible for injecting into the flume channel the each Event section:
-
-```
-<Event>
-...
-</Event>
-```
 
 Notes
 =====
 This plugin is based on flume-tail-directory https://github.com/keedio/flume-taildirectory-source  
 
-The module has been refactored in order to decoupled classes and has been created differents listeners.
+The module has been refactored in order to decoupled classes.
 
 
 Compilation
 ===========
 ```
-mvn package
+mvn clean package
 ```
 
 Use
@@ -47,17 +28,32 @@ Configuration
 | ------------- | :-----: | :---------- |
 | Channels | - |  |
 | Type | - | org.keedio.watchdir.listener.WatchDirXMLWinEventSourceListener |
-| dirs | - | list of directories to be monitorized comma separated |
+| dirs.1.dir | - | directory to be monitorized (only one) |
+| dirs.1.whitelist | - | regex pattern indicating whitelist files to be monitorized (ex. \\.xml) |
+| dirs.1.blacklist | - | regex pattern indicating blacklist files to be excluded (ex. \\.xml) |
+| dirs.1.tag | - | tag of th event (ex. Event) |
+| dirs.1.taglevel | - | level of the tag for nested tags in the XML (ex. 2) |
+| dirs.2.dir | - | second directory configuration... |
+| dirs.2.whitelist | - | ... |
+| dirs.2.blacklist | - | ... |
+| dirs.2.tag | - | ... |
+| dirs.2.taglevel | - | ... |
+| dirs.whitelist | - | regex pattern indicating whitelist files to be monitorized (ex. \\.xml). If it is set it will rewrite the directory one |
+| dirs.blacklist | - | regex pattern indicating blacklist files to be excluded (ex. \\.xml). If it is set it will rewrite the directory one |
 
 * Example
 ```
 ...
 flume.sources.r1.type = org.keedio.watchdir.listener.WatchDirXMLWinEventSourceListener
-flume.sources.r1.dirs = /tmp/dir1,/tmp/dir2
+flume.sources.r1.dirs.1.dir = /tmp/dir1
+flume.sources.r1.dirs.1.blacklist =
+flume.sources.r1.dirs.1.whitelist = \\.xml
+flume.sources.r1.dirs.1.taglevel = 1
+flume.sources.r1.dirs.1.tag = Event
+flume.sources.r1.dirs.2.dir = /tmp/dir2
+flume.sources.r1.dirs.2.blacklist =
+flume.sources.r1.dirs.2.whitelist = \\.xml,\\.wxml
+flume.sources.r1.dirs.2.tag = Obj
+flume.sources.r1.dirs.2.taglevel = 2
 ...
 ```
-
-TO DO:
-======
-
-* Include multi thread posibility to parallelize tasks
