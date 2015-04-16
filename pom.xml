@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.keedio.flume</groupId>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
   <name>xmlwineventsource</name>
@@ -71,7 +71,25 @@
           <target>1.7</target>
         </configuration>
       </plugin>      
+
+    <!-- Se empaquetan las dependencias para enviarselas a Produban -->
+<plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-shade-plugin</artifactId>
+		  <version>2.3</version>
+		  <executions>
+		     <!-- Run shade goal on package phase -->
+		    <execution>
+			<phase>package</phase>
+			<goals>
+				<goal>shade</goal>
+			</goals>
+		      </execution>
+		  </executions>
+		</plugin>
+
     </plugins>
+    
   </build>
   <artifactId>xmlwineventsource</artifactId>
 </project>

@@ -2,14 +2,14 @@ package org.keedio.watchdir;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.nio.file.WatchEvent.Kind;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.keedio.watchdir.listener.FakeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,23 @@ public class WatchDirObserver implements Runnable {
 	private static final Logger LOGGER= LoggerFactory
 			.getLogger(WatchDirObserver.class);
 	private final Map<WatchKey, Path> keys;
+	private WatchDirFileSet set;
 	
+    public WatchDirObserver(WatchDirFileSet set) {
+    	this.set = set;
+    	keys = new HashMap<WatchKey, Path>();
+    	listeners = new ArrayList<WatchDirListener>();
+    	
+		try {
+			Path directotyToWatch = Paths.get(set.getPath());
+	        watcherSvc = FileSystems.getDefault().newWatchService();
+	        registerAll(directotyToWatch);
+
+		} catch (IOException e){
+			LOGGER.info("No se puede monitorizar el directorio: " + set.getPath(), e);
+		}
+    }
+
     static <T> WatchEvent<T> castEvent(WatchEvent<?> event) {
         return (WatchEvent<T>)event;
     }
@@ -59,22 +75,6 @@ public class WatchDirObserver implements Runnable {
 	static <T> WatchEvent<T> cast(WatchEvent<?> event) {
 		return (WatchEvent<T>) event;
 	}
-
-    public WatchDirObserver (String dir) {
-    	
-    	keys = new HashMap<WatchKey, Path>();
-    	listeners = new ArrayList<WatchDirListener>();
-    	
-		try {
-			Path directotyToWatch = Paths.get(dir);
-	        watcherSvc = FileSystems.getDefault().newWatchService();
-	        registerAll(directotyToWatch);
-
-		} catch (IOException e){
-			LOGGER.info("No se puede monitorizar el directorio: " + dir, e);
-		}
-    	
-    }
 
     /**
      * Register the given directory, and all its sub-directories, with the WatchService.
@@ -138,9 +138,24 @@ public class WatchDirObserver implements Runnable {
     					// Si se crea un nuevo directorio es necesario registrarlo de nuevo
     					if (Files.isDirectory(path, NOFOLLOW_LINKS))
     						registerAll(path);
-    					else
-    						// En caso contrario notificamos el cambio sobre el fichero
-    						update(new WatchDirEvent(path.toString(), event.kind().name()));
+    					else {
+    						if (set.getWhitelist().isEmpty() && set.getBlacklist().isEmpty()){
+    							// Si las dos listas estan vacias notificamos
+        						update(new WatchDirEvent(path.toString(), event.kind().name(), set));    							
+    						} else {
+    							// En caso contrario
+        						// Comprobamos si esta en la blacklist
+        						if (!set.getWhitelist().isEmpty() && match(set.getWhitelist(), path.toString())){
+        							LOGGER.debug("Whitelisted. Go on");
+        							update(new WatchDirEvent(path.toString(), event.kind().name(), set));
+        							break;
+        						} else if (!set.getBlacklist().isEmpty() && !match(set.getBlacklist(), path.toString())) {
+        							LOGGER.debug("Not in blacklisted. Go on");
+        							update(new WatchDirEvent(path.toString(), event.kind().name(), set));
+        							break;
+        						}
+    						}
+    					}
     					
     				}
 
@@ -157,5 +172,23 @@ public class WatchDirObserver implements Runnable {
     		}
     	}
 	}
+    
+    public static boolean match(String patterns, String string) {
+    	
+    	String[] splitPat = patterns.split(",");
+    	boolean match = false;
+    	
+    	for (String pattern:splitPat) {
+        	Pattern pat = Pattern.compile(pattern + "$");
+        	Matcher mat = pat.matcher(string);
+        	
+        	match = match || mat.find();
+        	
+        	if (match) break;
+    	}
+    	
+    	
+    	return match;
+    }
 
 }

@@ -43,12 +43,14 @@ public class WatchDirTest {
         FakeListener listener = mock(FakeListener.class);
         //doReturn(22).when(listener).process(any(WatchEvent.class));
 
-        // Si no existen listeners sale del hilo
-
+        String whitelist = "";
+        String blacklist = "";
+        
         File tstFolder = testFolder.newFolder("/tempFolder/");
         logger.info("tstFolder created");
 
-        WatchDirObserver monitor = new WatchDirObserver(tstFolder.getAbsolutePath());
+        WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+        WatchDirObserver monitor = new WatchDirObserver(set);
         logger.info("WatchDirObserver created");
 
         monitor.addWatchDirListener(listener);
@@ -71,11 +73,15 @@ public class WatchDirTest {
         FakeListener listener = mock(FakeListener.class);
         //doReturn(22).when(listener).process(any(WatchEvent.class));
 
+        String whitelist = "";
+        String blacklist = "";
+
         try {
             // Si no existen listeners sale del hilo
             File tstFolder = testFolder.newFolder("/tempFolder/");
 
-            WatchDirObserver monitor = new WatchDirObserver(tstFolder.getAbsolutePath());
+            WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+            WatchDirObserver monitor = new WatchDirObserver(set);
             Thread t = new Thread(monitor);
             t.start();
 
@@ -97,12 +103,16 @@ public class WatchDirTest {
         FakeListener listener = mock(FakeListener.class);
         //doReturn(22).when(listener).process(any(WatchEvent.class));
 
+        String whitelist = "";
+        String blacklist = "";
+
         try {
             // Si no existen listeners sale del hilo
             File tstFolder1 = testFolder.newFolder("/tempFolder1/");
             File tstFolder2 = testFolder.newFolder("/tempFolder2/");
 
-            WatchDirObserver monitor = new WatchDirObserver(tstFolder1.getAbsolutePath());
+            WatchDirFileSet set = new WatchDirFileSet(tstFolder1.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+            WatchDirObserver monitor = new WatchDirObserver(set);
             monitor.addWatchDirListener(listener);
             Thread t = new Thread(monitor);
             t.start();
@@ -126,6 +136,130 @@ public class WatchDirTest {
             e.printStackTrace();
             Assert.fail();
         }
+    }
+
+    @Test
+    public void testCreatedButBlacklisted() throws IOException, WatchDirException, InterruptedException {
+
+
+        FakeListener listener = mock(FakeListener.class);
+        //doReturn(22).when(listener).process(any(WatchEvent.class));
+
+        String whitelist = "";
+        String blacklist = "\\.xml,\\.filepart";
+        
+        File tstFolder = testFolder.newFolder("/tempFolder/");
+        logger.info("tstFolder created");
+
+        WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+        WatchDirObserver monitor = new WatchDirObserver(set);
+        logger.info("WatchDirObserver created");
+
+        monitor.addWatchDirListener(listener);
+        Thread t = new Thread(monitor);
+        t.start();
+        logger.info("Thread started");
+
+        // Creamos el fichero
+        testFolder.newFile("tempFolder/dd.filepart");
+        logger.info("dd.dat created");
+
+        waitFor(20);
+        verify(listener, times(0)).process(any(WatchDirEvent.class));
+
+    }
+    
+    @Test
+    public void testCreatedButNotWhitelisted() throws IOException, WatchDirException, InterruptedException {
+
+
+        FakeListener listener = mock(FakeListener.class);
+        //doReturn(22).when(listener).process(any(WatchEvent.class));
+
+        String whitelist = "\\.xml,\\.filepart";
+        String blacklist = "";
+        
+        File tstFolder = testFolder.newFolder("/tempFolder/");
+        logger.info("tstFolder created");
+
+        WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+        WatchDirObserver monitor = new WatchDirObserver(set);
+        logger.info("WatchDirObserver created");
+
+        monitor.addWatchDirListener(listener);
+        Thread t = new Thread(monitor);
+        t.start();
+        logger.info("Thread started");
+
+        // Creamos el fichero
+        testFolder.newFile("tempFolder/dd.dat");
+        logger.info("dd.dat created");
+
+        waitFor(20);
+        verify(listener, times(0)).process(any(WatchDirEvent.class));
+
+    }
+    
+    @Test
+    public void testCreatedAndWhitelisted() throws IOException, WatchDirException, InterruptedException {
+
+
+        FakeListener listener = mock(FakeListener.class);
+        //doReturn(22).when(listener).process(any(WatchEvent.class));
+
+        String whitelist = "\\.xml,\\.filepart";
+        String blacklist = "";
+        
+        File tstFolder = testFolder.newFolder("/tempFolder/");
+        logger.info("tstFolder created");
+
+        WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+        WatchDirObserver monitor = new WatchDirObserver(set);
+        logger.info("WatchDirObserver created");
+
+        monitor.addWatchDirListener(listener);
+        Thread t = new Thread(monitor);
+        t.start();
+        logger.info("Thread started");
+
+        // Creamos el fichero
+        testFolder.newFile("tempFolder/dd.filepart");
+        logger.info("dd.dat created");
+
+        waitFor(20);
+        verify(listener, times(1)).process(any(WatchDirEvent.class));
+
+    }
+
+    @Test
+    public void testCreatedAndBlacklisted() throws IOException, WatchDirException, InterruptedException {
+
+
+        FakeListener listener = mock(FakeListener.class);
+        //doReturn(22).when(listener).process(any(WatchEvent.class));
+
+        String whitelist = "";
+        String blacklist = "\\\\.xml,\\\\.filepart";
+        
+        File tstFolder = testFolder.newFolder("/tempFolder/");
+        logger.info("tstFolder created");
+
+        WatchDirFileSet set = new WatchDirFileSet(tstFolder.getAbsolutePath(), "Event", 1, whitelist, blacklist);
+        WatchDirObserver monitor = new WatchDirObserver(set);
+        logger.info("WatchDirObserver created");
+
+        monitor.addWatchDirListener(listener);
+        Thread t = new Thread(monitor);
+        t.start();
+        logger.info("Thread started");
+
+        // Creamos el fichero
+        testFolder.newFile("tempFolder/dd.dat");
+        logger.info("dd.dat created");
+
+        waitFor(20);
+        verify(listener, times(1)).process(any(WatchDirEvent.class));
+
     }
 
     private static void waitFor(int seg) throws InterruptedException {
