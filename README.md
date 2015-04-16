@@ -40,6 +40,7 @@ Configuration
 | dirs.2.taglevel | - | ... |
 | dirs.whitelist | - | regex pattern indicating whitelist files to be monitorized (ex. \\.xml). If it is set it will rewrite the directory one |
 | dirs.blacklist | - | regex pattern indicating blacklist files to be excluded (ex. \\.xml). If it is set it will rewrite the directory one |
+| dirs.maxworkers | - | max number of workers to parse the xml files. Use for performance improvements |
 
 * Example
 ```
@@ -55,5 +56,8 @@ flume.sources.r1.dirs.2.blacklist =
 flume.sources.r1.dirs.2.whitelist = \\.xml,\\.wxml
 flume.sources.r1.dirs.2.tag = Obj
 flume.sources.r1.dirs.2.taglevel = 2
+flume.sources.r1.dirs.blacklist =
+flume.sources.r1.dirs.whitelist =
+flume.sources.r1.dirs.maxworkers =
 ...
 ```
