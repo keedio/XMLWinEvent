@@ -61,7 +61,7 @@ public class WatchDirObserver implements Runnable {
     	listeners.add(listener);
     }
     
-    private void update(WatchDirEvent event) {
+    protected void update(WatchDirEvent event) {
     	for (WatchDirListener listener:listeners) {
     		try{
         		listener.process(event);

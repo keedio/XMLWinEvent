@@ -164,7 +164,7 @@ public class WatchDirXMLWinEventSourceListenerTest {
         	FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp2/test.xml"));
         	FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp3/test.xml"));
 
-            Thread.sleep(20000);
+            Thread.sleep(2000000);
             verify(mock, times(2)).process(any(WatchDirEvent.class));
 
 

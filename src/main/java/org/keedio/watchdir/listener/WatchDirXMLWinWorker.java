@@ -1,7 +1,17 @@
 package org.keedio.watchdir.listener;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -9,12 +19,17 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
+
 import org.apache.flume.Event;
+import org.apache.flume.SourceRunner;
 import org.apache.flume.event.EventBuilder;
 import org.keedio.watchdir.WatchDirEvent;
 import org.keedio.watchdir.metrics.MetricsEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.glaforge.i18n.io.CharsetToolkit;
+import com.google.common.base.Charsets;
 
 /**
  * This worker proccess the xml file in order to extract the expeted events.
@@ -43,9 +58,17 @@ public class WatchDirXMLWinWorker implements Runnable {
 			int procesados = 0;
 			XMLInputFactory xif = XMLInputFactory.newInstance();
 			xif.setProperty("javax.xml.stream.isNamespaceAware", false);
-
-			StreamSource source = new StreamSource(event.getPath());
-			XMLEventReader xev = xif.createXMLEventReader(source);
+			
+			//Reader eventReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(event.getPath()))));
+			//StreamSource source = new StreamSource(eventReader);
+			
+			Charset charset = CharsetToolkit.guessEncoding(new File(event.getPath()), 4096, StandardCharsets.UTF_16);
+			LOGGER.debug("Juego de caracteres detectado: " + charset.displayName());
+			//Reader eventReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(event.getPath()))));
+			//StreamSource source = new StreamSource(eventReader);
+			StreamSource source = new StreamSource((new URL("file://" + event.getPath()).openStream()));
+			
+			XMLEventReader xev = xif.createXMLEventReader(source.getInputStream(), Charsets.UTF_16.name());
 			
 			while (xev.hasNext()) {
 			    XMLEvent xmlEvent = xev.nextEvent();
@@ -96,7 +119,11 @@ public class WatchDirXMLWinWorker implements Runnable {
 			listener.getMetricsController().manage(new MetricsEvent(MetricsEvent.TOTAL_FILE_EVENTS, procesados));
 			
 		} catch (Exception e) {
+			LOGGER.error("Error procesando el fichero: " + event.getPath());
+			LOGGER.error("Se espera fichero XML: " + event.getSet().getTagName());
+			
 			LOGGER.error(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
