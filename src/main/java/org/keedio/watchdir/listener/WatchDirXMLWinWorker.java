@@ -3,6 +3,7 @@ package org.keedio.watchdir.listener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -28,8 +29,8 @@ import org.keedio.watchdir.metrics.MetricsEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.glaforge.i18n.io.CharsetToolkit;
 import com.google.common.base.Charsets;
+
 
 /**
  * This worker proccess the xml file in order to extract the expeted events.
@@ -52,6 +53,7 @@ public class WatchDirXMLWinWorker implements Runnable {
 	@Override
 	public void run() {
 		try {
+			Thread.sleep(listener.waitUntilProccess);
 			
 			int level = 0;
 			Date inicio = new Date();
@@ -62,13 +64,16 @@ public class WatchDirXMLWinWorker implements Runnable {
 			//Reader eventReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(event.getPath()))));
 			//StreamSource source = new StreamSource(eventReader);
 			
-			Charset charset = CharsetToolkit.guessEncoding(new File(event.getPath()), 4096, StandardCharsets.UTF_16);
-			LOGGER.debug("Juego de caracteres detectado: " + charset.displayName());
-			//Reader eventReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(event.getPath()))));
-			//StreamSource source = new StreamSource(eventReader);
+			//Charset charset = CharsetToolkit.guessEncoding(new File(event.getPath()), 4096, StandardCharsets.UTF_16);
+			//LOGGER.debug("Juego de caracteres detectado: " + charset.displayName());
+			//InputStream eventReader = new FileInputStream(new File(event.getPath()));
+			//StreamSource source = new StreamSource();
+			//source.setInputStream(eventReader);
 			StreamSource source = new StreamSource((new URL("file://" + event.getPath()).openStream()));
+			//Reader eventReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(event.getPath())),Charsets.UTF_8));
+			//StreamSource source = new StreamSource(eventReader);
 			
-			XMLEventReader xev = xif.createXMLEventReader(source.getInputStream(), Charsets.UTF_16.name());
+			XMLEventReader xev = xif.createXMLEventReader(source);
 			
 			while (xev.hasNext()) {
 			    XMLEvent xmlEvent = xev.nextEvent();

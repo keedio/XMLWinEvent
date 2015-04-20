@@ -76,6 +76,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	private static final String TAGNAME = "tag";
 	private static final String TAGLEVEL = "taglevel";
 	private static final String MAX_WORKERS = "maxworkers";
+	private static final String TIME_WAIT = "timewait";
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(WatchDirXMLWinEventSourceListener.class);
 	private ExecutorService executor;
@@ -85,6 +86,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	private MetricsController metricsController;
 	private Set<WatchDirFileSet> fileSets;
 	private int maxWorkers = 10;
+	protected int waitUntilProccess = 2000;
 	
 	public synchronized MetricsController getMetricsController() {
 		return metricsController;
@@ -110,6 +112,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		String globalWhiteList = context.getString(WHITELIST);
 		String globalBlackList = context.getString(BLACKLIST);
 		maxWorkers = context.getString(MAX_WORKERS)==null?10:Integer.parseInt(context.getString(MAX_WORKERS));
+		waitUntilProccess = context.getString(TIME_WAIT)==null?2000:Integer.parseInt(context.getString(TIME_WAIT));
 		
 		// Creamos los filesets
 		fileSets = new HashSet<WatchDirFileSet>();

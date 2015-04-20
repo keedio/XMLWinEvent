@@ -164,7 +164,7 @@ public class WatchDirXMLWinEventSourceListenerTest {
         	FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp2/test.xml"));
         	FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp3/test.xml"));
 
-            Thread.sleep(2000000);
+            Thread.sleep(20000);
             verify(mock, times(2)).process(any(WatchDirEvent.class));
 
 
@@ -197,6 +197,11 @@ public class WatchDirXMLWinEventSourceListenerTest {
 		String str = ((Map<String, String>)test.get("2")).get("3");
 		Assert.assertTrue("El elemento 2, 3", "2.3".equals(str));
 		
+	}
+	
+	@Test
+	public void longCopyTest() {
+
 	}
 
 }
