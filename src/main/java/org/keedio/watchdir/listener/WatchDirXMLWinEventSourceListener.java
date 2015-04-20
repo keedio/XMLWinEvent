@@ -164,7 +164,6 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			Iterator<WatchDirFileSet> it = fileSets.iterator();
 			
 			while(it.hasNext()) {
-//				WatchDirObserver aux = new WatchDirObserver(dirs[i], whitelist, blacklist);
 				WatchDirObserver aux = new WatchDirObserver(it.next());
 				aux.addWatchDirListener(this);
 

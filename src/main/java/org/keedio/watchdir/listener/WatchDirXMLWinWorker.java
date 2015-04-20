@@ -1,18 +1,8 @@
 package org.keedio.watchdir.listener;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.StringWriter;
-import java.net.URI;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
-
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -20,16 +10,12 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
-
 import org.apache.flume.Event;
-import org.apache.flume.SourceRunner;
 import org.apache.flume.event.EventBuilder;
 import org.keedio.watchdir.WatchDirEvent;
 import org.keedio.watchdir.metrics.MetricsEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Charsets;
 
 
 /**
@@ -61,18 +47,7 @@ public class WatchDirXMLWinWorker implements Runnable {
 			XMLInputFactory xif = XMLInputFactory.newInstance();
 			xif.setProperty("javax.xml.stream.isNamespaceAware", false);
 			
-			//Reader eventReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(event.getPath()))));
-			//StreamSource source = new StreamSource(eventReader);
-			
-			//Charset charset = CharsetToolkit.guessEncoding(new File(event.getPath()), 4096, StandardCharsets.UTF_16);
-			//LOGGER.debug("Juego de caracteres detectado: " + charset.displayName());
-			//InputStream eventReader = new FileInputStream(new File(event.getPath()));
-			//StreamSource source = new StreamSource();
-			//source.setInputStream(eventReader);
 			StreamSource source = new StreamSource((new URL("file://" + event.getPath()).openStream()));
-			//Reader eventReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(event.getPath())),Charsets.UTF_8));
-			//StreamSource source = new StreamSource(eventReader);
-			
 			XMLEventReader xev = xif.createXMLEventReader(source);
 			
 			while (xev.hasNext()) {
