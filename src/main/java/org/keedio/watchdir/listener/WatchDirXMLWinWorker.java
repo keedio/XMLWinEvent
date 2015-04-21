@@ -1,8 +1,11 @@
 package org.keedio.watchdir.listener;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Date;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -10,6 +13,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
+
 import org.apache.flume.Event;
 import org.apache.flume.event.EventBuilder;
 import org.keedio.watchdir.WatchDirEvent;
@@ -39,7 +43,6 @@ public class WatchDirXMLWinWorker implements Runnable {
 	@Override
 	public void run() {
 		try {
-			Thread.sleep(listener.waitUntilProccess);
 			
 			int level = 0;
 			Date inicio = new Date();
@@ -47,8 +50,9 @@ public class WatchDirXMLWinWorker implements Runnable {
 			XMLInputFactory xif = XMLInputFactory.newInstance();
 			xif.setProperty("javax.xml.stream.isNamespaceAware", false);
 			
-			StreamSource source = new StreamSource((new URL("file://" + event.getPath()).openStream()));
-			XMLEventReader xev = xif.createXMLEventReader(source);
+			URL url = new URL("file://" + event.getPath());
+			InputStream is = new BufferedInputStream(url.openStream(), listener.bufferSize);
+			XMLEventReader xev = xif.createXMLEventReader(is);
 			
 			while (xev.hasNext()) {
 			    XMLEvent xmlEvent = xev.nextEvent();
