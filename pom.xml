@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.keedio.flume</groupId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
 
   <name>xmlwineventsource</name>
@@ -46,7 +46,6 @@
           <artifactId>log4j</artifactId>
           <version>1.2.17</version>
       </dependency>
-            
 	<dependency>
 		<groupId>stax</groupId>
 		<artifactId>stax</artifactId>

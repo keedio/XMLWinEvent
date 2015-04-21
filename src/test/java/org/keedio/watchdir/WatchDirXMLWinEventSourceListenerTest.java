@@ -198,5 +198,10 @@ public class WatchDirXMLWinEventSourceListenerTest {
 		Assert.assertTrue("El elemento 2, 3", "2.3".equals(str));
 		
 	}
+	
+	@Test
+	public void longCopyTest() {
+
+	}
 
 }

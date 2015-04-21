@@ -41,5 +41,4 @@ public class WatchDirEvent {
 		this.set = set;
 	}
 	
-	
 }

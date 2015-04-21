@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -61,7 +59,7 @@ public class WatchDirObserver implements Runnable {
     	listeners.add(listener);
     }
     
-    private void update(WatchDirEvent event) {
+    protected void update(WatchDirEvent event) {
     	for (WatchDirListener listener:listeners) {
     		try{
         		listener.process(event);
