@@ -43,6 +43,7 @@ public class WatchDirXMLWinWorker implements Runnable {
 	@Override
 	public void run() {
 		try {
+			//Thread.sleep(500);
 			
 			int level = 0;
 			Date inicio = new Date();

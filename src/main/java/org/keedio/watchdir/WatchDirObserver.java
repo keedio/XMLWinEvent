@@ -146,11 +146,11 @@ public class WatchDirObserver implements Runnable {
         						if (!set.getWhitelist().isEmpty() && match(set.getWhitelist(), path.toString())){
         							LOGGER.debug("Whitelisted. Go on");
         							update(new WatchDirEvent(path.toString(), event.kind().name(), set));
-        							break;
+        							//break;
         						} else if (!set.getBlacklist().isEmpty() && !match(set.getBlacklist(), path.toString())) {
         							LOGGER.debug("Not in blacklisted. Go on");
         							update(new WatchDirEvent(path.toString(), event.kind().name(), set));
-        							break;
+        							//break;
         						}
     						}
     					}
