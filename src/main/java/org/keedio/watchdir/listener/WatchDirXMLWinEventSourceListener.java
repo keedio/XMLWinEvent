@@ -106,7 +106,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			fileSets.add(auxSet);
 		}
 
-		Preconditions.checkState(fileSets.isEmpty(), "Bad configuration, review documentation on https://github.com/keedio/XMLWinEvent/blob/master/README.md");	
+		Preconditions.checkState(!fileSets.isEmpty(), "Bad configuration, review documentation on https://github.com/keedio/XMLWinEvent/blob/master/README.md");	
 
 	}
 	
