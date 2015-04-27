@@ -18,31 +18,16 @@
  ****************************************************************/
 package org.keedio.watchdir.listener;
 
-import java.io.StringWriter;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
-import javax.xml.transform.stream.StreamSource;
-
 import org.apache.flume.Context;
-import org.apache.flume.Event;
 import org.apache.flume.EventDrivenSource;
 import org.apache.flume.conf.Configurable;
-import org.apache.flume.event.EventBuilder;
 import org.apache.flume.source.AbstractSource;
 import org.keedio.watchdir.WatchDirEvent;
 import org.keedio.watchdir.WatchDirException;
@@ -54,7 +39,6 @@ import org.keedio.watchdir.metrics.MetricsEvent;
 import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
 
 /**
@@ -80,8 +64,6 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(WatchDirXMLWinEventSourceListener.class);
 	private ExecutorService executor;
-	private String confDirs;
-	private String[] dirs;
 	private Set<WatchDirObserver> monitor; 
 	private MetricsController metricsController;
 	private Set<WatchDirFileSet> fileSets;
@@ -124,7 +106,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			fileSets.add(auxSet);
 		}
 
-		Preconditions.checkState(fileSets.size() > 0, "Bad configuration, review documentation on https://github.com/keedio/XMLWinEvent/blob/master/README.md");	
+		Preconditions.checkState(fileSets.isEmpty(), "Bad configuration, review documentation on https://github.com/keedio/XMLWinEvent/blob/master/README.md");	
 
 	}
 	
@@ -141,7 +123,7 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 			String auxValue = all.get(key);
 			
 			if (!map.containsKey(mapKey)) {
-				HashMap<String, String> auxMap = new HashMap<String, String>();
+				Map<String, String> auxMap = new HashMap<String, String>();
 				auxMap.put(auxKey, auxValue);
 				
 				map.put(mapKey, auxMap);

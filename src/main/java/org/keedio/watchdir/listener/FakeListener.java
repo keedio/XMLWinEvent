@@ -13,7 +13,6 @@ public class FakeListener implements WatchDirListener {
 
 	@Override
 	public void process(WatchDirEvent event) throws WatchDirException {
-		// TODO Auto-generated method stub
 		System.out.println("Got event: " + event.getPath() + " " + event.getType());
 	}
 

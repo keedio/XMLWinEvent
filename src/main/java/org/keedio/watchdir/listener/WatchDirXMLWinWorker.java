@@ -5,15 +5,12 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Date;
-
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import javax.xml.transform.stream.StreamSource;
-
 import org.apache.flume.Event;
 import org.apache.flume.event.EventBuilder;
 import org.keedio.watchdir.WatchDirEvent;
@@ -43,8 +40,6 @@ public class WatchDirXMLWinWorker implements Runnable {
 	@Override
 	public void run() {
 		try {
-			//Thread.sleep(500);
-			
 			int level = 0;
 			Date inicio = new Date();
 			int procesados = 0;
@@ -108,7 +103,6 @@ public class WatchDirXMLWinWorker implements Runnable {
 			LOGGER.error("Se espera fichero XML: " + event.getSet().getTagName());
 			
 			LOGGER.error(e.getMessage());
-			e.printStackTrace();
 		}
 	}
 

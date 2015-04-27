@@ -5,7 +5,6 @@ import org.apache.flume.instrumentation.MonitoredCounterGroup;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.UniformSnapshot;
 
 /**
 *This class represents the controller metrics to publish to the source. 
@@ -57,6 +56,8 @@ public class MetricsController extends MonitoredCounterGroup implements MetricsM
 		case MetricsEvent.MEAN_FILE_PROCESS:
 			meanProcessTime.update(event.getValue());
 			break;
+		default:
+			throw new IllegalStateException();
 		}
 	}
 
