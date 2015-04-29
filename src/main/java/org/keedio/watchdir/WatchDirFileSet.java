@@ -97,8 +97,13 @@ public class WatchDirFileSet {
 	}
 	public void setExistingFiles(Set<String> existingFiles) {
 		this.existingFiles = existingFiles;
+	}	
+	public boolean isReadOnStartup() {
+		return readOnStartup;
 	}
-	
+	public void setReadOnStartup(boolean readOnStartup) {
+		this.readOnStartup = readOnStartup;
+	}
 	/**
 	 * Given a file, checks if the file is in the whitelist, so have to proccess or in the blacklist
 	 * so have to discard

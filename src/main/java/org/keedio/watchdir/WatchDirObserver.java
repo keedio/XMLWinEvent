@@ -123,11 +123,12 @@ public class WatchDirObserver implements Runnable {
     			boolean fin = false;
     			
     			// En primer lugar procesamos todos los ficheros pre-existentes
-    			// TODO --> Esto tiene que ser configurable
-    			for(String file:set.getExistingFiles()) {
-    				WatchDirEvent event = new WatchDirEvent(file, "ENTRY_CREATE", set);
-    				update(event);
-    				LOGGER.debug("Fichero existente anteriormente:" + file + " .Se procesa");
+    			if (set.isReadOnStartup()) {
+        			for(String file:set.getExistingFiles()) {
+        				WatchDirEvent event = new WatchDirEvent(file, "ENTRY_CREATE", set);
+        				update(event);
+        				LOGGER.debug("Fichero existente anteriormente:" + file + " .Se procesa");
+        			}
     			}
     			
     			while (!fin) {
