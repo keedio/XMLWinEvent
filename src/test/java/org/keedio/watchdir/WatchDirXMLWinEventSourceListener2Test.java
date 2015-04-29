@@ -35,7 +35,7 @@ import static org.hamcrest.core.StringContains.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-public class WatchDirXMLWinEventSourceListenerTest {
+public class WatchDirXMLWinEventSourceListener2Test {
 
 	
 	WatchDirXMLWinEventSourceListener listener;
@@ -58,6 +58,11 @@ public class WatchDirXMLWinEventSourceListenerTest {
         tstFolder2 = testFolder.newFolder("/tmp2/");
         tstFolder3 = testFolder.newFolder("/tmp3/");
 		
+		// Creamos el fichero en el directorio 1
+		FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp1/test.xml"));
+		FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp1/test2.xml"));
+		FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp3/test.xml"));
+
 		listener = new WatchDirXMLWinEventSourceListener();
 		
 		Channel channel = new MemoryChannel();
@@ -74,6 +79,8 @@ public class WatchDirXMLWinEventSourceListenerTest {
 		context.put("transactionCapacity", "100000");
 		context.put("blacklist", "");
 		context.put("whitelist", "");
+		context.put("readonstartup", "true");
+		context.put("suffix", ".completed");
 
 		Configurables.configure(listener, context);
 		Configurables.configure(channel, context);
@@ -93,113 +100,22 @@ public class WatchDirXMLWinEventSourceListenerTest {
 	public void finish() {
 		listener.stop();
 	}
-	
-	@Test
-	public void testOnGoing() {
-		System.out.println();
-		Assert.assertTrue("El hilo esta corriendo", "START".equals(listener.getLifecycleState().toString()));
-	}
-	
-	@Test
-	public void testFileModified() {
 		
-		try {
-			// Registramos el FakeListener en todos los monitores
-			for (WatchDirObserver observer: listener.getMonitor()) {
-				observer.addWatchDirListener(mock);
-			}
-			
-
-            // Creamos el fichero en el directorio 1
-        	FileUtils.copyFile(new File("src/test/resources/nested.xml"), testFolder.newFile("tmp1/nested.xml"));
-
-            Thread.sleep(20000);
-            verify(mock, times(1)).process(any(WatchDirEvent.class));
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
-		
-	}
-	
-	@Test
-	public void testFileModifiedNotObserved() {
-		
-		try {
-			// Registramos el FakeListener en todos los monitores
-			for (WatchDirObserver observer: listener.getMonitor()) {
-				observer.addWatchDirListener(mock);
-			}
-			
-
-            // Creamos el fichero en el directorio 1
-        	FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp3/test.xml"));
-
-            Thread.sleep(20000);
-            verify(mock, times(0)).process(any(WatchDirEvent.class));
-            Assert.assertFalse("No se ha creado el fichero", new File("tmp3/test.xml.finished").exists());
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
-		
-	}
-
-	@Test
-	public void testFileModifiedTwoDirectories() throws Exception {
-		
-			// Registramos el FakeListener en todos los monitores
-			for (WatchDirObserver observer: listener.getMonitor()) {
-				observer.addWatchDirListener(mock);
-			}
-			
-
-            // Creamos el fichero en el directorio 1
-        	FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp1/test.xml"));
-        	FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp2/test.xml"));
-        	FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp3/test.xml"));
-
-            Thread.sleep(20000);
-            verify(mock, times(2)).process(any(WatchDirEvent.class));
-            
-            // Los ficheros .finished han tenido que ser generados.
-            thrown.expectMessage(containsString("already exists in the test folder"));
-            testFolder.newFile("tmp1/test.xml.finished").exists();
-            testFolder.newFile("tmp2/test.xml.finished").exists();
-
-
-	}
 	
 	@Test
 	public void testExistingFiles() throws Exception {
 		
-			// Creamos el fichero en el directorio 1
-    		FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp1/test.xml"));
-    		FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp1/test2.xml"));
-    		FileUtils.copyFile(new File("src/test/resources/test.xml"), testFolder.newFile("tmp3/test.xml"));
-
 			// Registramos el FakeListener en todos los monitores
 			for (WatchDirObserver observer: listener.getMonitor()) {
 				observer.addWatchDirListener(mock);
 			}
 			
-            Thread.sleep(20000);
-            verify(mock, times(2)).process(any(WatchDirEvent.class));
-            
+			Thread.sleep(2000);
+			            
             // Los ficheros .finished han tenido que ser generados.
             thrown.expectMessage(containsString("already exists in the test folder"));
-            testFolder.newFile("tmp1/test.xml.finished").exists();
-            testFolder.newFile("tmp1/test2.xml.finished").exists();
+            testFolder.newFile("tmp1/test.xml.completed").exists();
+            testFolder.newFile("tmp1/test2.xml.completed").exists();
 
 
 	}
@@ -225,9 +141,5 @@ public class WatchDirXMLWinEventSourceListenerTest {
 		
 	}
 	
-	@Test
-	public void longCopyTest() {
-
-	}
 
 }
