@@ -38,10 +38,12 @@ Configuration
 | dirs.2.blacklist | - | ... |
 | dirs.2.tag | - | ... |
 | dirs.2.taglevel | - | ... |
-| dirs.whitelist | - | regex pattern indicating whitelist files to be monitorized (ex. \\.xml). If it is set it will rewrite the directory one |
-| dirs.blacklist | - | regex pattern indicating blacklist files to be excluded (ex. \\.xml). If it is set it will rewrite the directory one |
-| dirs.maxworkers | - | max number of workers to parse the xml files. Use for performance improvements |
-| dirs.buffersize | - | Size for the buffer inputstream.  |
+| whitelist | - | regex pattern indicating whitelist files to be monitorized (ex. \\.xml). If it is set it will rewrite the directory one |
+| blacklist | - | regex pattern indicating blacklist files to be excluded (ex. \\.xml). If it is set it will rewrite the directory one |
+| maxworkers | - | max number of workers to parse the xml files. Use for performance improvements |
+| buffersize | - | Size for the buffer inputstream.  |
+|readonstartup|false|Used in order to indicate if the agent have to proccess files existing in the directory on startup|
+|suffix|.finished|Once a file is proccessed it will be renamed to file{suffix}|
 
 * Example
 ```
@@ -57,10 +59,12 @@ flume.sources.r1.dirs.2.blacklist =
 flume.sources.r1.dirs.2.whitelist = \\.xml,\\.wxml
 flume.sources.r1.dirs.2.tag = Obj
 flume.sources.r1.dirs.2.taglevel = 2
-flume.sources.r1.dirs.blacklist =
-flume.sources.r1.dirs.whitelist =
-flume.sources.r1.dirs.maxworkers = 10
-flume.sources.r1.dirs.buffersize = 1024
+flume.sources.r1.blacklist =
+flume.sources.r1.whitelist =
+flume.sources.r1.maxworkers = 10
+flume.sources.r1.buffersize = 1024
+flume.sources.r1.readonstartup = true
+flume.sources.r1.suffix = .completed
 ...
 ```
 
