@@ -61,14 +61,18 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 	private static final String TAGLEVEL = "taglevel";
 	private static final String MAX_WORKERS = "maxworkers";
 	private static final String BUFFER_SIZE = "buffersize";
+	private static final String READ_ON_STARTUP = "readonstartup";
+	private static final String SUFFIX = "suffix";
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(WatchDirXMLWinEventSourceListener.class);
 	private ExecutorService executor;
 	private Set<WatchDirObserver> monitor; 
 	private MetricsController metricsController;
 	private Set<WatchDirFileSet> fileSets;
+	private boolean readOnStartUp;
 	private int maxWorkers = 10;
 	protected int bufferSize = 1024;
+	protected String suffix;
 	
 	public synchronized MetricsController getMetricsController() {
 		return metricsController;
@@ -95,13 +99,15 @@ public class WatchDirXMLWinEventSourceListener extends AbstractSource implements
 		String globalBlackList = context.getString(BLACKLIST);
 		maxWorkers = context.getString(MAX_WORKERS)==null?10:Integer.parseInt(context.getString(MAX_WORKERS));
 		bufferSize = context.getString(BUFFER_SIZE)==null?1024:Integer.parseInt(context.getString(BUFFER_SIZE));
+		readOnStartUp = context.getBoolean(READ_ON_STARTUP)==null?false:context.getBoolean(READ_ON_STARTUP);
+		suffix = context.getString(SUFFIX)==null?".finished":context.getString(SUFFIX);
 		
 		// Creamos los filesets
 		fileSets = new HashSet<WatchDirFileSet>();
 		Iterator it = getCriterias.keySet().iterator();
 		while (it.hasNext()) {
 			Map<String, String> aux = (Map<String, String>)getCriterias.get(it.next());
-			WatchDirFileSet auxSet = new WatchDirFileSet(aux.get(DIR), aux.get(TAGNAME), Integer.parseInt(aux.get(TAGLEVEL)), globalWhiteList!=null?globalWhiteList:aux.get(WHITELIST), globalBlackList!=null?globalBlackList:aux.get(BLACKLIST));
+			WatchDirFileSet auxSet = new WatchDirFileSet(aux.get(DIR), aux.get(TAGNAME), Integer.parseInt(aux.get(TAGLEVEL)), globalWhiteList!=null?globalWhiteList:aux.get(WHITELIST), globalBlackList!=null?globalBlackList:aux.get(BLACKLIST), readOnStartUp, suffix);
 			
 			fileSets.add(auxSet);
 		}

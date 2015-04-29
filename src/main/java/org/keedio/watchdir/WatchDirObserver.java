@@ -122,6 +122,14 @@ public class WatchDirObserver implements Runnable {
     		try {
     			boolean fin = false;
     			
+    			// En primer lugar procesamos todos los ficheros pre-existentes
+    			// TODO --> Esto tiene que ser configurable
+    			for(String file:set.getExistingFiles()) {
+    				WatchDirEvent event = new WatchDirEvent(file, "ENTRY_CREATE", set);
+    				update(event);
+    				LOGGER.debug("Fichero existente anteriormente:" + file + " .Se procesa");
+    			}
+    			
     			while (!fin) {
     				// wait for key to be signaled
     				WatchKey key;
@@ -137,19 +145,8 @@ public class WatchDirObserver implements Runnable {
     					if (Files.isDirectory(path, NOFOLLOW_LINKS))
     						registerAll(path);
     					else {
-    						if (set.getWhitelist().isEmpty() && set.getBlacklist().isEmpty()){
-    							// Si las dos listas estan vacias notificamos
+    						if (set.haveToProccess(path.toString())) {
         						update(new WatchDirEvent(path.toString(), event.kind().name(), set));    							
-    						} else {
-    							// En caso contrario
-        						// Comprobamos si esta en la blacklist
-        						if (!set.getWhitelist().isEmpty() && match(set.getWhitelist(), path.toString())){
-        							LOGGER.debug("Whitelisted. Go on");
-        							update(new WatchDirEvent(path.toString(), event.kind().name(), set));        							//break;
-        						} else if (!set.getBlacklist().isEmpty() && !match(set.getBlacklist(), path.toString())) {
-        							LOGGER.debug("Not in blacklisted. Go on");
-        							update(new WatchDirEvent(path.toString(), event.kind().name(), set));
-        						}
     						}
     					}
     					

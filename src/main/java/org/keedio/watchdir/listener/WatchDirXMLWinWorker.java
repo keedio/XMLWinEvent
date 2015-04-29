@@ -1,16 +1,21 @@
 package org.keedio.watchdir.listener;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
 import org.apache.flume.Event;
 import org.apache.flume.event.EventBuilder;
 import org.keedio.watchdir.WatchDirEvent;
@@ -94,6 +99,11 @@ public class WatchDirXMLWinWorker implements Runnable {
 			// Se usa el system out para procesar los test de forma correcta
 			System.out.println("Se han procesado " + procesados + " elementos en " + intervalo + " milisegundos");
 
+			// Finalmente renombramos el fichero para saber que se ha procesado de forma correcta
+			Path oldPath = new File(event.getPath()).toPath();
+			Path newPath = new File(event.getPath() + listener.suffix).toPath();
+			Files.move(oldPath, oldPath.resolveSibling(newPath));
+			
 			// Notificamos el tiempo de procesado para las metricas
 			listener.getMetricsController().manage(new MetricsEvent(MetricsEvent.MEAN_FILE_PROCESS, intervalo));
 			listener.getMetricsController().manage(new MetricsEvent(MetricsEvent.TOTAL_FILE_EVENTS, procesados));
